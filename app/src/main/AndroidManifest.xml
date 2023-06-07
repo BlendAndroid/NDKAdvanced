@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".HelloWorldActivity"
+            android:label="Hello World" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
