@@ -16,6 +16,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
+            // NDK配置Cmake参数
             cmake {
                 cppFlags ''
             }
@@ -32,6 +33,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    // 指定CMakeLists.txt的地址，这是一个NDK工程
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
