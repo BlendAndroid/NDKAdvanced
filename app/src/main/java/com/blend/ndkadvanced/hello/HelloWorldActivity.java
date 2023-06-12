@@ -1,4 +1,4 @@
-package com.blend.ndkadvanced;
+package com.blend.ndkadvanced.hello;
 
 import android.os.Bundle;
 import android.widget.TextView;
@@ -29,9 +29,5 @@ public class HelloWorldActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
     public native String stringFromJNI();
 }

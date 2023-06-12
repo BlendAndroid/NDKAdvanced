@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.blend.ndkadvanced">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,7 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
-            android:name=".HelloWorldActivity"
+            android:name=".gif.GifDemoActivity"
+            android:label="Gif Demo" />
+        <activity
+            android:name=".hello.HelloWorldActivity"
             android:label="Hello World" />
         <activity
             android:name=".MainActivity"
