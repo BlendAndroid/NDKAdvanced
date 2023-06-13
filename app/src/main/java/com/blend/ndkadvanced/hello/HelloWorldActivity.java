@@ -1,7 +1,6 @@
 package com.blend.ndkadvanced.hello;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,12 +51,8 @@ public class HelloWorldActivity extends AppCompatActivity {
         TextView tv = mBinding.sampleText;
         tv.setText(stringFromJNI());
 
-        mBinding.fromJNIDynamic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tv.setText(stringFromJNIDynamic());
-            }
-        });
+        mBinding.fromJNIDynamic.setOnClickListener(v -> tv.setText(stringFromJNIDynamic()));
+
     }
 
 
@@ -65,7 +60,4 @@ public class HelloWorldActivity extends AppCompatActivity {
 
     // 动态注册，这里爆红没有关系
     public native String stringFromJNIDynamic();
-
-    // 静态方法
-    public static native String staticString();
 }
