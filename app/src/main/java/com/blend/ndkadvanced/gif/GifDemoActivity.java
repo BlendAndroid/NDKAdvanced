@@ -53,7 +53,7 @@ public class GifDemoActivity extends AppCompatActivity {
     }
 
     public void ndkLoadGif() {
-        File file = new File(Environment.getExternalStorageDirectory(), "earth_night.gif");
+        File file = new File(Environment.getExternalStorageDirectory(), "test.gif");
         mGifHandler = GifHandler.load(file.getAbsolutePath());
         // int width = mGifHandler.getWidth();
         // int height = mGifHandler.getHeight();

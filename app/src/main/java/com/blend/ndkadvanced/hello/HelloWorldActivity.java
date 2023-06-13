@@ -65,4 +65,7 @@ public class HelloWorldActivity extends AppCompatActivity {
 
     // 动态注册，这里爆红没有关系
     public native String stringFromJNIDynamic();
+
+    // 静态方法
+    public static native String staticString();
 }

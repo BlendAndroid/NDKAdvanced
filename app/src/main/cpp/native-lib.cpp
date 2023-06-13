@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
 
+#include <android/bitmap.h>
+
 // 以C的方式加载
 extern "C" {
 #include "gif_lib.h"
@@ -13,6 +15,24 @@ JNIEXPORT jstring JNICALL
 Java_com_blend_ndkadvanced_hello_HelloWorldActivity_stringFromJNI(JNIEnv *env, jobject thiz) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
+}
+
+// 全局的string
+jclass stringClass;
+
+// static 定义的就是jclass的变量
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_blend_ndkadvanced_hello_HelloWorldActivity_staticString(JNIEnv *env, jclass clazz) {
+    jclass tempClass = env->FindClass("java/lang/String");
+    stringClass = static_cast<jclass>(env->NewGlobalRef(tempClass));
+
+    //合适的地方销毁
+    env->DeleteGlobalRef(stringClass);
+    if (stringClass == nullptr) {
+        return nullptr;
+    }
+    return (jstring) "-1";
 }
 
 /**********************************Gif播放*************************************************/
@@ -31,6 +51,8 @@ Java_com_blend_ndkadvanced_gif_GifHandler_loadGif(JNIEnv *env, jclass clazz, jst
     const char *path = env->GetStringUTFChars(path_, 0);
 
     int ERROR;
+
+    __android_log_print(ANDROID_LOG_INFO, "loadGif path", "%s", path);
 
     // 打开gif文件，传递Error的地址
     GifFileType *gifFileType = DGifOpenFileName(path, &ERROR);
