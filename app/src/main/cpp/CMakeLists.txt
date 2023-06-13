@@ -11,8 +11,8 @@ add_library(
         native-lib
         SHARED
         native-lib.cpp
-        dgif_lib.c
-        gifalloc.c)
+        gif/dgif_lib.c
+        gif/gifalloc.c)
 
 # find_library(name1 path1 path2 ...) 将一个变量和Android NDK的某个库建立关联关系。
 # 该函数的第二个参数为Android NDK中对应的库名称，而调用该方法之后，它就被和第一个参数所指定的变量关联在一起。

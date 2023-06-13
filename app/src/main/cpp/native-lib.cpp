@@ -5,7 +5,7 @@
 
 // 以C的方式加载
 extern "C" {
-#include "gif_lib.h"
+#include "gif/gif_lib.h"
 }
 
 #include <android/log.h>
