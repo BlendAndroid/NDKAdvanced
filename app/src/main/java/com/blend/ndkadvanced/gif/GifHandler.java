@@ -18,7 +18,7 @@ public class GifHandler {
     // 加载gif
     public static GifHandler load(String absolutePath) {
         long gifHandler = loadGif(absolutePath);
-        Log.e(TAG, "gifHandler: " + gifHandler);
+
         return new GifHandler(gifHandler);
     }
 
@@ -32,6 +32,10 @@ public class GifHandler {
 
     public int getHeight() {
         return getHeight(gifHandler);
+    }
+
+    public int updateFrame(Bitmap bitmap) {
+        return updateFrame(gifHandler, bitmap);
     }
 
     // 加载Gif
