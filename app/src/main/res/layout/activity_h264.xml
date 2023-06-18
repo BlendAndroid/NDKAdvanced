@@ -4,27 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".h264.H264Activity">
 
     <Button
-        android:id="@+id/btnHelloWorld"
+        android:id="@+id/h264Encoder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World"
-        android:textAllCaps="false" />
+        android:text="编码视频" />
 
     <Button
-        android:id="@+id/btnGif"
+        android:id="@+id/h264Decoder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Gif"
-        android:textAllCaps="false" />
+        android:text="解码视频" />
 
     <Button
-        android:id="@+id/btnH264"
+        android:id="@+id/h264DecoderBitmap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="H264编解码"
-        android:textAllCaps="false" />
+        android:text="解码视频图片展示" />
+
+    <SurfaceView
+        android:id="@+id/h264PlayerPreview"
+        android:layout_width="368dp"
+        android:layout_height="384dp" />
+
+    <ImageView
+        android:id="@+id/h264PlayerImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
 
 </LinearLayout>
