@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".golomb.GolombActivity">
+
+    <Button
+        android:id="@+id/btnH264Golomb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="哥伦布编码测试" />
+
+    <Button
+        android:id="@+id/btnH264Codec"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="解析SPS，获取宽高" />
+
+</LinearLayout>
