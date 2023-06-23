@@ -34,6 +34,8 @@ public class H264Activity extends AppCompatActivity {
 
     private ScreenShortService mScreenShortService;
 
+    private ScreenShortServiceConnection mServiceConnection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,16 +50,24 @@ public class H264Activity extends AppCompatActivity {
     }
 
     private void encoder() {
-        mBinding.h264Encoder.setOnClickListener(new View.OnClickListener() {
+        mBinding.h264Encoder.setOnClickListener(v -> {
+            // 开启屏幕录制服务
+            bindScreenService();
+        });
+
+        mBinding.h264EncoderClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 开启屏幕录制服务
-                bindScreenService();
+                // 结束屏幕录制
+                mScreenShortService.stopRecord();
+                unbindService(mServiceConnection);
             }
         });
     }
 
     private void bindScreenService() {
+        mServiceConnection = new ScreenShortServiceConnection();
+
         Intent intent = new Intent();
         intent.setClass(this, ScreenShortService.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -113,7 +123,17 @@ public class H264Activity extends AppCompatActivity {
         }
     }
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
+    @Override
+    protected void onDestroy() {
+        if (mServiceConnection != null) {
+            unbindService(mServiceConnection);
+            mServiceConnection = null;
+        }
+        super.onDestroy();
+    }
+
+    private class ScreenShortServiceConnection implements ServiceConnection {
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (service instanceof ScreenShortService.ScreenShortBinder) {
@@ -129,15 +149,6 @@ public class H264Activity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
 
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mServiceConnection != null) {
-            unbindService(mServiceConnection);
-            mServiceConnection = null;
         }
     }
 }

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -16,10 +17,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
-
+        <activity
+            android:name=".camera1.Camera1Activity"
+            android:label="Camera1" />
+        <activity
+            android:name=".h265.H265Activity"
+            android:label="H265编解码" />
+        <activity
+            android:name=".golomb.GolombActivity"
+            android:label="哥伦布编码" />
         <activity
             android:name=".h264.H264Activity"
-            android:label="H264编解码" />
+            android:label="H264编解码"
+            android:launchMode="singleTask" />
         <activity
             android:name=".gif.GifDemoActivity"
             android:label="Gif Demo" />
