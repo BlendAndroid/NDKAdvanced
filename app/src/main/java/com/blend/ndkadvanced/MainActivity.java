@@ -4,12 +4,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.blend.ndkadvanced.camera1.Camera1Activity;
 import com.blend.ndkadvanced.databinding.ActivityMainBinding;
 import com.blend.ndkadvanced.gif.GifDemoActivity;
+import com.blend.ndkadvanced.golomb.GolombActivity;
 import com.blend.ndkadvanced.h264.H264Activity;
 import com.blend.ndkadvanced.hello.HelloWorldActivity;
 
@@ -36,6 +39,16 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnH264.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, H264Activity.class)));
+
+        binding.btnGolomb.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, GolombActivity.class)));
+
+        binding.btnCamera1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, Camera1Activity.class));
+            }
+        });
 
     }
 

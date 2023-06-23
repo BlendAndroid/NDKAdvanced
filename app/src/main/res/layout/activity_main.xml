@@ -27,4 +27,25 @@
         android:text="H264编解码"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btnGolomb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="哥伦布编码"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnH265"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="H265编解码"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnCamera1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Camera1"
+        android:textAllCaps="false" />
+
 </LinearLayout>
