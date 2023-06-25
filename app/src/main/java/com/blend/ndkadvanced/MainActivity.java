@@ -15,6 +15,8 @@ import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
 import com.blend.ndkadvanced.h264.H264Activity;
 import com.blend.ndkadvanced.hello.HelloWorldActivity;
+import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
+import com.blend.ndkadvanced.screenshare.push.PushScreenShareActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,22 +52,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        binding.btnScreenSharePush.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PushScreenShareActivity.class));
+            }
+        });
+
+        binding.btnScreenSharePlayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PlayerScreenShareActivity.class));
+            }
+        });
+
     }
 
     public void verifyStoragePermissions() {
         int REQUEST_EXTERNAL_STORAGE = 1;
 
-        String[] PERMISSIONS_STORAGE = {
+        String[] PERMISSIONS = {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA};
         try {
             //检测是否有写的权限
             int permission = ActivityCompat.checkSelfPermission(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    Manifest.permission.READ_EXTERNAL_STORAGE);
 
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 // 没有写的权限，去申请写的权限，会弹出对话框
-                ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+                ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS, REQUEST_EXTERNAL_STORAGE);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -13,6 +13,11 @@
         android:text="拍照"
         android:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/imgCamera1Bitmap"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
     <com.blend.ndkadvanced.camera1.Camera1SurfaceView
         android:id="@+id/SurfaceCamera1"
         android:layout_width="match_parent"
