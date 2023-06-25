@@ -18,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".screenshare.player.PlayerScreenShareActivity"
+            android:label="屏幕共享播放端" />
+        <activity
+            android:name=".screenshare.push.PushScreenShareActivity"
+            android:label="屏幕共享推流端" />
+        <activity
             android:name=".camera1.Camera1Activity"
             android:label="Camera1" />
         <activity
@@ -48,6 +54,11 @@
 
         <service
             android:name=".h264.ScreenShortService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="mediaProjection" />
+        <service
+            android:name=".screenshare.push.PushScreenShareService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaProjection" />
