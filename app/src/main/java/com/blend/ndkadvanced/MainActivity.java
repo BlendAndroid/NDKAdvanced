@@ -17,6 +17,8 @@ import com.blend.ndkadvanced.h264.H264Activity;
 import com.blend.ndkadvanced.hello.HelloWorldActivity;
 import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
 import com.blend.ndkadvanced.screenshare.push.PushScreenShareActivity;
+import com.blend.ndkadvanced.videochat.player.PlayerVideoChatActivity;
+import com.blend.ndkadvanced.videochat.push.PushVideoChatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,26 +47,20 @@ public class MainActivity extends AppCompatActivity {
         binding.btnGolomb.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, GolombActivity.class)));
 
-        binding.btnCamera1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Camera1Activity.class));
-            }
-        });
+        binding.btnCamera1.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, Camera1Activity.class)));
 
-        binding.btnScreenSharePush.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PushScreenShareActivity.class));
-            }
-        });
+        binding.btnScreenSharePush.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, PushScreenShareActivity.class)));
 
-        binding.btnScreenSharePlayer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PlayerScreenShareActivity.class));
-            }
-        });
+        binding.btnScreenSharePlayer.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, PlayerScreenShareActivity.class)));
+
+        binding.btnVideoChatPush.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, PushVideoChatActivity.class)));
+
+        binding.btnVideoChatPlayer.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, PlayerVideoChatActivity.class)));
 
     }
 

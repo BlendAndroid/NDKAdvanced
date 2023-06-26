@@ -62,4 +62,18 @@
         android:text="屏幕共享播放端"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btnVideoChatPush"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="视频通话推流端"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnVideoChatPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="视频通话播放端"
+        android:textAllCaps="false" />
+
 </LinearLayout>

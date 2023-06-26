@@ -18,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".videochat.push.PushVideoChatActivity"
+            android:label="视频通话推流端" />
+        <activity
+            android:name=".videochat.player.PlayerVideoChatActivity"
+            android:label="视频通话播放端" />
+        <activity
             android:name=".screenshare.player.PlayerScreenShareActivity"
             android:label="屏幕共享播放端" />
         <activity
