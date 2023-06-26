@@ -150,11 +150,10 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
         }
     }
 
-    int index = 0;
 
     private void capture(byte[] temp) {
         //保存一张照片
-        String fileName = "IMG_" + index++ + ".jpg";  //jpeg文件名定义
+        String fileName = "IMG_" + System.currentTimeMillis() + ".jpg";  //jpeg文件名定义
         File sdRoot = getContext().getExternalCacheDir();
 
         File pictureFile = new File(sdRoot, fileName);
