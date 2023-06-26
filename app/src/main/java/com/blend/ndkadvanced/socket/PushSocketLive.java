@@ -1,4 +1,4 @@
-package com.blend.ndkadvanced.screenshare.push;
+package com.blend.ndkadvanced.socket;
 
 import android.util.Log;
 
@@ -8,23 +8,27 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 
-public class PushSocketLive {
+public class PushSocketLive implements SocketLive {
 
     private static final String TAG = "PushSocketLive";
 
     private WebSocket webSocket;
-    private int port;
 
-    public PushSocketLive(int port) {
-        this.port = port;
+    private SocketCallback socketCallback;
+
+    public PushSocketLive(SocketCallback socketCallback) {
+        this.socketCallback = socketCallback;
     }
 
+    @Override
     public void start() {
         Log.e(TAG, "start: ");
         webSocketServer.start();
     }
 
+    @Override
     public void close() {
         try {
             webSocket.close();
@@ -35,6 +39,15 @@ public class PushSocketLive {
             e.printStackTrace();
         }
 
+    }
+
+
+    @Override
+    public void sendData(byte[] bytes) {
+        if (webSocket != null && webSocket.isOpen()) {
+            Log.e(TAG, "webSocket sendData: ");
+            webSocket.send(bytes);
+        }
     }
 
     private final WebSocketServer webSocketServer = new WebSocketServer(new InetSocketAddress(12001)) {
@@ -55,6 +68,17 @@ public class PushSocketLive {
         }
 
         @Override
+        public void onMessage(WebSocket conn, ByteBuffer bytes) {
+            super.onMessage(conn, bytes);
+            Log.i(TAG, "消息长度  : " + bytes.remaining());
+            byte[] buf = new byte[bytes.remaining()];
+            bytes.get(buf);
+            if (socketCallback != null) {
+                socketCallback.callBack(buf);
+            }
+        }
+
+        @Override
         public void onError(WebSocket webSocket, Exception e) {
             e.printStackTrace();
             Log.i(TAG, "onError:  " + e.toString());
@@ -65,12 +89,4 @@ public class PushSocketLive {
             Log.e(TAG, "onStart: ");
         }
     };
-
-
-    public void sendData(byte[] bytes) {
-        if (webSocket != null && webSocket.isOpen()) {
-            Log.e(TAG, "webSocket sendData: ");
-            webSocket.send(bytes);
-        }
-    }
 }

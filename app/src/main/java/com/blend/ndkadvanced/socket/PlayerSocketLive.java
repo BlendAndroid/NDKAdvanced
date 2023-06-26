@@ -1,4 +1,4 @@
-package com.blend.ndkadvanced.screenshare.player;
+package com.blend.ndkadvanced.socket;
 
 import android.util.Log;
 
@@ -9,18 +9,17 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.nio.ByteBuffer;
 
-public class PlayerSocketLive {
+public class PlayerSocketLive  implements SocketLive {
     private static final String TAG = "PlayerSocketLive";
 
     private SocketCallback socketCallback;
     private MyWebSocketClient myWebSocketClient;
-    private int port;
 
-    public PlayerSocketLive(SocketCallback socketCallback, int port) {
+    public PlayerSocketLive(SocketCallback socketCallback) {
         this.socketCallback = socketCallback;
-        this.port = port;
     }
 
+    @Override
     public void start() {
         try {
             URI url = new URI("ws://10.221.150.178:12001");
@@ -29,6 +28,16 @@ public class PlayerSocketLive {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void close() {
+
+    }
+
+    @Override
+    public void sendData(byte[] bytes) {
+
     }
 
 
@@ -65,10 +74,5 @@ public class PlayerSocketLive {
             e.printStackTrace();
             Log.e(TAG, "onError: ");
         }
-    }
-
-
-    public interface SocketCallback {
-        void callBack(byte[] data);
     }
 }
