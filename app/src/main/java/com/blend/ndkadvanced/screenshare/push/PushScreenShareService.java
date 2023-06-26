@@ -22,6 +22,7 @@ import android.view.Surface;
 import androidx.annotation.Nullable;
 
 import com.blend.ndkadvanced.R;
+import com.blend.ndkadvanced.socket.PushSocketLive;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -182,7 +183,10 @@ public class PushScreenShareService extends Service {
     public static final int NAL_VPS = 32;
     private byte[] vps_sps_pps_buf;
 
+    // 每一帧的前面得加上vps，sps和pps
+    // 一个ByteBuffer就是一个NAL单元
     private void dealFrame(ByteBuffer bb, MediaCodec.BufferInfo bufferInfo) {
+        // 偏移量设置是4
         int offset = 4;
         if (bb.get(2) == 0x01) {
             offset = 3;

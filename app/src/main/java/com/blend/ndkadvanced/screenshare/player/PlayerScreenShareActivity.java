@@ -11,11 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blend.ndkadvanced.databinding.ActivityPlayerScreenShareBinding;
+import com.blend.ndkadvanced.socket.PlayerSocketLive;
+import com.blend.ndkadvanced.socket.SocketCallback;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class PlayerScreenShareActivity extends AppCompatActivity implements PlayerSocketLive.SocketCallback {
+public class PlayerScreenShareActivity extends AppCompatActivity implements SocketCallback {
 
     private static final String TAG = "PlayerScreenShare";
 
@@ -50,7 +52,7 @@ public class PlayerScreenShareActivity extends AppCompatActivity implements Play
 
 
     private void initSocket() {
-        PlayerSocketLive screenLive = new PlayerSocketLive(this, 12001);
+        PlayerSocketLive screenLive = new PlayerSocketLive(this);
         screenLive.start();
     }
 
@@ -72,20 +74,22 @@ public class PlayerScreenShareActivity extends AppCompatActivity implements Play
     public void callBack(byte[] data) {
         Log.i(TAG, "callBack: " + data.length);
         int index = mediaCodec.dequeueInputBuffer(100000);
-//index   索引
+        // index   索引
         if (index >= 0) {
             ByteBuffer inputBuffer = mediaCodec.getInputBuffer(index);
             inputBuffer.clear();
             inputBuffer.put(data, 0, data.length);
-//       通知dsp芯片帮忙解码
-            mediaCodec.queueInputBuffer(index,
-                    0, data.length, System.currentTimeMillis(), 0);
+            // 通知dsp芯片帮忙解码
+            mediaCodec.queueInputBuffer(index, 0, data.length, System.currentTimeMillis(), 0);
         }
+        Log.i(TAG, "index: " + index);
 
-//        获取数据
+        // 获取解码后的数据
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
-        int outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 100000);
+        int outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 100_000);
+        Log.i(TAG, "outputBufferIndex: " + outputBufferIndex);
 
+        // 这里是while语句，如果缓存数据没有解析完成，就一直解析
         while (outputBufferIndex > 0) {
             mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
             outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 0);

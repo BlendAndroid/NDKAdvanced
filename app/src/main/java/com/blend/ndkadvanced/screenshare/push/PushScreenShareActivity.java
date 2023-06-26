@@ -18,7 +18,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blend.ndkadvanced.databinding.ActivityPushScreenShareBinding;
+import com.blend.ndkadvanced.socket.PushSocketLive;
 
+/**
+ * 出现黑屏的原因，就是要遇到下面一个I帧，前面加上vps和pps，如果没有I帧，就会一直黑屏
+ * 这也是为什么我切换了场景，播放端就会显示出来
+ */
 public class PushScreenShareActivity extends AppCompatActivity {
 
     private ActivityPushScreenShareBinding mBinding;
@@ -65,7 +70,7 @@ public class PushScreenShareActivity extends AppCompatActivity {
             if (result.getResultCode() == RESULT_OK) {
                 mMediaProjection = mMediaProjectionManager.getMediaProjection(result.getResultCode(), result.getData());
                 if (mPushScreenShareService != null) {
-                    mPushSocketLive = new PushSocketLive(12001);
+                    mPushSocketLive = new PushSocketLive(null);
                     // 开始Socket服务
                     mPushSocketLive.start();
 
