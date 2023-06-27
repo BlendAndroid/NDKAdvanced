@@ -34,7 +34,7 @@ public class PlayerVideoChatActivity extends AppCompatActivity implements Socket
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
                 surface = holder.getSurface();
                 decoderPlayerLiveH265 = new DecoderPlayerLiveH265();
-                decoderPlayerLiveH265.initDecoder(surface);
+                decoderPlayerLiveH265.initDecoder(surface, 1080, 1920);
 
             }
 

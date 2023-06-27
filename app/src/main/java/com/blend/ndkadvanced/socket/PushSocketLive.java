@@ -9,6 +9,7 @@ import org.java_websocket.server.WebSocketServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class PushSocketLive implements SocketLive {
 
@@ -70,9 +71,9 @@ public class PushSocketLive implements SocketLive {
         @Override
         public void onMessage(WebSocket conn, ByteBuffer bytes) {
             super.onMessage(conn, bytes);
-            Log.i(TAG, "消息长度  : " + bytes.remaining());
             byte[] buf = new byte[bytes.remaining()];
             bytes.get(buf);
+            Log.i(TAG, "接收视频数据  : " + Arrays.toString(buf));
             if (socketCallback != null) {
                 socketCallback.callBack(buf);
             }

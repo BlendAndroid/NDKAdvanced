@@ -2,14 +2,14 @@ package com.blend.ndkadvanced.socket;
 
 import android.util.Log;
 
-import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-public class PlayerSocketLive  implements SocketLive {
+public class PlayerSocketLive implements SocketLive {
     private static final String TAG = "PlayerSocketLive";
 
     private SocketCallback socketCallback;
@@ -22,7 +22,7 @@ public class PlayerSocketLive  implements SocketLive {
     @Override
     public void start() {
         try {
-            URI url = new URI("ws://10.221.150.178:12001");
+            URI url = new URI("ws://10.221.147.213:12001");
             myWebSocketClient = new MyWebSocketClient(url);
             myWebSocketClient.connect();
         } catch (Exception e) {
@@ -37,7 +37,9 @@ public class PlayerSocketLive  implements SocketLive {
 
     @Override
     public void sendData(byte[] bytes) {
-
+        if (myWebSocketClient != null && (myWebSocketClient.isOpen())) {
+            myWebSocketClient.send(bytes);
+        }
     }
 
 
@@ -58,9 +60,9 @@ public class PlayerSocketLive  implements SocketLive {
 
         @Override
         public void onMessage(ByteBuffer bytes) {
-            Log.e(TAG, "消息长度  : " + bytes.remaining());
             byte[] buf = new byte[bytes.remaining()];
             bytes.get(buf);
+            Log.i(TAG, "接收视频数据  : " + Arrays.toString(buf));
             socketCallback.callBack(buf);
         }
 

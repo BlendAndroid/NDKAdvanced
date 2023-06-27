@@ -8,7 +8,6 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
-import com.blend.ndkadvanced.socket.SocketCallback;
 import com.blend.ndkadvanced.socket.SocketLive;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ import java.io.IOException;
 public class LocalSurfaceView extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
     private Camera.Size size;
     private Camera mCamera;
-    private EncoderPushLiveH265 encodecPushLiveH265;
+    private EncoderPushLiveH265 encoderPushLiveH265;
 
     public LocalSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -62,16 +61,16 @@ public class LocalSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     //接受到  MainActivity调用
     public void startCapture(SocketLive socketLive) {
-        encodecPushLiveH265 = new EncoderPushLiveH265(socketLive, size.width, size.height);
-        encodecPushLiveH265.startLive();
+        encoderPushLiveH265 = new EncoderPushLiveH265(socketLive, size.width, size.height);
+        encoderPushLiveH265.startLive();
     }
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
 //        获取到摄像头的原始数据yuv
 //        开始    视频通话
-        if (encodecPushLiveH265 != null) {
-            encodecPushLiveH265.encodeFrame(bytes);
+        if (encoderPushLiveH265 != null) {
+            encoderPushLiveH265.encodeFrame(bytes);
         }
 
         mCamera.addCallbackBuffer(bytes);

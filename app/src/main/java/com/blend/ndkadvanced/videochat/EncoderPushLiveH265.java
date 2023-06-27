@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class EncoderPushLiveH265 {
-    private static final String TAG = "David";
+    private static final String TAG = "EncoderPushLiveH265";
     private MediaCodec mediaCodec;
     int width;
     int height;
@@ -30,8 +30,8 @@ public class EncoderPushLiveH265 {
 
     public EncoderPushLiveH265(SocketLive socketLive, int width, int height) {
         this.socketLive = socketLive;
-//        简历链接
-        socketLive.start();
+//        建立连接
+        this.socketLive.start();
         this.width = width;
         this.height = height;
     }
@@ -114,7 +114,7 @@ public class EncoderPushLiveH265 {
             final byte[] bytes = new byte[bufferInfo.size];
             bb.get(bytes);
             this.socketLive.sendData(bytes);
-            Log.v(TAG, "视频数据  " + Arrays.toString(bytes));
+            Log.e(TAG, "发送视频数据：  " + Arrays.toString(bytes));
         }
     }
 }
