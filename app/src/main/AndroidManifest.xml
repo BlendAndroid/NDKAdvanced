@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".audio.AudioActivity"
+            android:label="音频" />
+        <activity
             android:name=".videochat.push.PushVideoChatActivity"
             android:label="视频通话推流端" />
         <activity

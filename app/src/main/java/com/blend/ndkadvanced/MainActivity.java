@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.blend.ndkadvanced.audio.AudioActivity;
 import com.blend.ndkadvanced.camera1.Camera1Activity;
 import com.blend.ndkadvanced.databinding.ActivityMainBinding;
 import com.blend.ndkadvanced.gif.GifDemoActivity;
@@ -61,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnVideoChatPlayer.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, PlayerVideoChatActivity.class)));
+
+        binding.btnAudio.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, AudioActivity.class)));
 
     }
 

@@ -76,4 +76,11 @@
         android:text="视频通话播放端"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btnAudio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="音频"
+        android:textAllCaps="false" />
+
 </LinearLayout>
