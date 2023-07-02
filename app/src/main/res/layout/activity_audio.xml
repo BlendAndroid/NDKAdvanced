@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".audio.AudioActivity">
 
     <Button
@@ -10,6 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="音频剪辑"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnAudioMix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="混音"
         android:textAllCaps="false" />
 
 </LinearLayout>

@@ -38,6 +38,25 @@ public class AudioActivity extends AppCompatActivity {
                 }).start();
             }
         });
+
+        mBinding.btnAudioMix.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // final String aacPath = new File(getExternalCacheDir(), "music.mp3").getAbsolutePath();
+                        // final String outPath = getExternalCacheDir().getAbsolutePath();
+                        // try {
+                        //     FileUtils.copyAssets(AudioActivity.this, "music.mp3", aacPath);
+                        //     new MusicMixProcess().mixAudioTrack(aacPath, outPath, 10 * 1000 * 1000, 15 * 1000 * 1000);
+                        // } catch (Exception e) {
+                        //     e.printStackTrace();
+                        // }
+                    }
+                }).start();
+            }
+        });
     }
 
 
