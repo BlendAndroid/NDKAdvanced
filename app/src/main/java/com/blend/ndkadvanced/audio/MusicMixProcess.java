@@ -45,21 +45,23 @@ public class MusicMixProcess {
                               int aacVolume
     ) throws Exception {
 
-        final File videoPcmFile = new File(Environment.getExternalStorageDirectory(), "video.pcm");
-        final File musicPcmFile = new File(Environment.getExternalStorageDirectory(), "music.pcm");
+        final File videoPcmFile = new File(context.getExternalCacheDir(), "video.pcm");
+        final File musicPcmFile = new File(context.getExternalCacheDir(), "music.pcm");
 
         decodeToPCM(videoInput, videoPcmFile.getAbsolutePath(), startTimeUs, endTimeUs);
 
         decodeToPCM(audioInput, musicPcmFile.getAbsolutePath(), startTimeUs, endTimeUs);
 
 
-        final File mixPcmFile = new File(Environment.getExternalStorageDirectory(), "mix.pcm");
+        final File mixOutput = new File(context.getExternalCacheDir(), "mixOutput.pcm");
         // 混合PCM
-        mixPcm(videoPcmFile.getAbsolutePath(), musicPcmFile.getAbsolutePath(), mixPcmFile.getAbsolutePath(), videoVolume, aacVolume);
+        mixPcm(videoPcmFile.getAbsolutePath(), musicPcmFile.getAbsolutePath(), mixOutput.getAbsolutePath(), videoVolume, aacVolume);
 
+        // 将PCM转换成了WAV,但是没有压缩,只不过换成了后缀是mp3
         new PcmToWavUtil(44100, AudioFormat.CHANNEL_IN_STEREO,
-                2, AudioFormat.ENCODING_PCM_16BIT).pcmToWav(mixPcmFile.getAbsolutePath()
+                2, AudioFormat.ENCODING_PCM_16BIT).pcmToWav(mixOutput.getAbsolutePath()
                 , output);
+        Log.i(TAG, "decodeToWAV: 转换完毕");
     }
 
     /**
@@ -72,14 +74,14 @@ public class MusicMixProcess {
      * @throws Exception
      */
     @SuppressLint("WrongConstant")
-    private void decodeToPCM(String musicPath, String outPath, int startTime, int endTime) throws Exception {
+    public static void decodeToPCM(String musicPath, String outPath, int startTime, int endTime) throws Exception {
         if (endTime < startTime) {
             return;
         }
         MediaExtractor mediaExtractor = new MediaExtractor();
 
         mediaExtractor.setDataSource(musicPath);
-        int audioTrack = selectTrack(mediaExtractor);
+        int audioTrack = selectTrack(mediaExtractor, true);
 
         mediaExtractor.selectTrack(audioTrack);
         mediaExtractor.seekTo(startTime, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
@@ -100,7 +102,7 @@ public class MusicMixProcess {
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         int outputBufferIndex;
         while (true) {
-            int decodeInputIndex = mediaCodec.dequeueInputBuffer(100000);
+            int decodeInputIndex = mediaCodec.dequeueInputBuffer(1_000);
             if (decodeInputIndex >= 0) {
                 long sampleTimeUs = mediaExtractor.getSampleTime();
 
@@ -125,12 +127,12 @@ public class MusicMixProcess {
                 mediaExtractor.advance();
             }
 
-            outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 100_000);
+            outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 1_000);
             while (outputBufferIndex >= 0) {
                 ByteBuffer decodeOutputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
                 writeChannel.write(decodeOutputBuffer);
                 mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
-                outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 100_000);
+                outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 1_000);
             }
         }
         writeChannel.close();
@@ -141,32 +143,39 @@ public class MusicMixProcess {
         Log.i(TAG, "decodeToPCM: 转换完毕");
     }
 
-    private int selectTrack(MediaExtractor mediaExtractor) {
-        int numTracks = mediaExtractor.getTrackCount();
+
+    public static int selectTrack(MediaExtractor extractor, boolean audio) {
+        int numTracks = extractor.getTrackCount();
         for (int i = 0; i < numTracks; i++) {
-            MediaFormat format = mediaExtractor.getTrackFormat(i);
+            MediaFormat format = extractor.getTrackFormat(i);
             String mime = format.getString(MediaFormat.KEY_MIME);
-            if (mime.startsWith("audio/")) {
-                return i;
+            if (audio) {
+                if (mime.startsWith("audio/")) {
+                    return i;
+                }
+            } else {
+                if (mime.startsWith("video/")) {
+                    return i;
+                }
             }
         }
-        return -1;
+        return -5;
     }
 
 
-    private float normalizeVolume(int volume) {
+    private static float normalizeVolume(int volume) {
         return volume / 100f * 1;
     }
 
     // 开始混音
-    private void mixPcm(String pcm1Path, String pcm2Path, String toPath
-            , int volume1, int volume2) throws IOException {
+    public static void mixPcm(String pcm1Path, String pcm2Path, String toPath,
+                        int volume1, int volume2) throws IOException {
 
         // 防止精度丢失
         float vol1 = normalizeVolume(volume1);
         float vol2 = normalizeVolume(volume2);
 
-        //每次的读取的文件，2K
+        // 每次的读取的文件，2K
         byte[] buffer1 = new byte[2048];
         byte[] buffer2 = new byte[2048];
 
@@ -227,5 +236,6 @@ public class MusicMixProcess {
         is1.close();
         is2.close();
         fileOutputStream.close();
+        Log.i(TAG, "decodeToPCM: 混合完毕");
     }
 }

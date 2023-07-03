@@ -1,10 +1,15 @@
 package com.blend.ndkadvanced.audio;
 
+import android.content.Context;
+import android.media.AudioFormat;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.util.Log;
+
+import com.blend.ndkadvanced.utils.PcmToWavUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +17,55 @@ import java.nio.ByteBuffer;
 
 public class VideoAndMusicMixProcess {
 
+    private static final String TAG = "VideoAndMusicMixProcess";
+
     private static final int TIMEOUT = 1000;
 
+    public static void mixAudioTrack(Context context,
+                                     final String videoInput,
+                                     final String audioInput,
+                                     final String output,
+                                     final Integer startTimeUs, final Integer endTimeUs,
+                                     int videoVolume,
+                                     int aacVolume
+    ) throws Exception {
 
-    public static void mixVideoAndMusic(String videoInput, String output, Integer startTimeUs,
-                                        Integer endTimeUs, File wavFile) throws IOException {
+        File cacheDir = context.getExternalCacheDir();
+//        下载下来的音乐转换城pcm
+        File aacPcmFile = new File(cacheDir, "audio" + ".pcm");
+//        视频自带的音乐转换城pcm
+        File videoPcmFile = new File(cacheDir, "video" + ".pcm");
+
+        MusicMixProcess.decodeToPCM(audioInput, aacPcmFile.getAbsolutePath(), startTimeUs, endTimeUs);
+
+        MusicMixProcess.decodeToPCM(videoInput, videoPcmFile.getAbsolutePath(), startTimeUs, endTimeUs);
+
+//         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+//         mediaMetadataRetriever.setDataSource(audioInput);
+// //        读取音乐时间
+//         final int aacDurationMs = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+//         mediaMetadataRetriever.release();
+
+        // MediaExtractor audioExtractor = new MediaExtractor();
+        // audioExtractor.setDataSource(audioInput);
+
+        File adjustedPcm = new File(cacheDir, "mix" + ".pcm");
+        MusicMixProcess.mixPcm(videoPcmFile.getAbsolutePath(), aacPcmFile.getAbsolutePath(),
+                adjustedPcm.getAbsolutePath(), videoVolume, aacVolume);
+
+        File wavFile = new File(cacheDir, adjustedPcm.getName() + ".wav");
+        new PcmToWavUtil(44100, AudioFormat.CHANNEL_IN_STEREO, 2, AudioFormat.ENCODING_PCM_16BIT)
+                .pcmToWav(adjustedPcm.getAbsolutePath(), wavFile.getAbsolutePath());
+        Log.i(TAG, "mixAudioTrack: 转换完毕");
+//混音的wav文件   + 视频文件   ---》  生成
+
+        mixVideoAndMusic(context, videoInput, output, startTimeUs, endTimeUs, wavFile);
+
+    }
+
+
+    public static void mixVideoAndMusic(Context context, String videoInput, String output, Integer startTimeUs,
+                                        Integer endTimeUs, File wavFile) throws Exception {
 
 
         //        初始化一个视频封装容器
@@ -28,9 +77,9 @@ public class VideoAndMusicMixProcess {
         MediaExtractor mediaExtractor = new MediaExtractor();
         mediaExtractor.setDataSource(videoInput);
 //            拿到视频轨道的索引
-        int videoIndex = selectTrack(mediaExtractor, false);
+        int videoIndex = MusicMixProcess.selectTrack(mediaExtractor, false);
 
-        int audioIndex = selectTrack(mediaExtractor, true);
+        int audioIndex = MusicMixProcess.selectTrack(mediaExtractor, true);
 
 
 //            视频配置 文件
@@ -46,21 +95,19 @@ public class VideoAndMusicMixProcess {
         // 添加一个空的轨道  轨道格式取自 视频文件，跟视频所有信息一样
         int muxerAudioIndex = mediaMuxer.addTrack(audioFormat);
 
-
 //            音频轨道开辟好了  输出开始工作
         mediaMuxer.start();
 
-//音频的wav
+        //音频的wav
         MediaExtractor pcmExtractor = new MediaExtractor();
         pcmExtractor.setDataSource(wavFile.getAbsolutePath());
-        int audioTrack = selectTrack(pcmExtractor, true);
+        int audioTrack = MusicMixProcess.selectTrack(pcmExtractor, true);
         pcmExtractor.selectTrack(audioTrack);
+
         MediaFormat pcmTrackFormat = pcmExtractor.getTrackFormat(audioTrack);
-
-
         //最大一帧的 大小
         int maxBufferSize = 0;
-        if (audioFormat.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)) {
+        if (pcmTrackFormat.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)) {
             maxBufferSize = pcmTrackFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
         } else {
             maxBufferSize = 100 * 1000;
@@ -86,7 +133,7 @@ public class VideoAndMusicMixProcess {
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         boolean encodeDone = false;
         while (!encodeDone) {
-            int inputBufferIndex = encoder.dequeueInputBuffer(10000);
+            int inputBufferIndex = encoder.dequeueInputBuffer(TIMEOUT);
             if (inputBufferIndex >= 0) {
                 long sampleTime = pcmExtractor.getSampleTime();
 
@@ -178,26 +225,9 @@ public class VideoAndMusicMixProcess {
             encoder.release();
             mediaMuxer.release();
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    }
-
-    public static int selectTrack(MediaExtractor extractor, boolean audio) {
-        int numTracks = extractor.getTrackCount();
-        for (int i = 0; i < numTracks; i++) {
-            MediaFormat format = extractor.getTrackFormat(i);
-            String mime = format.getString(MediaFormat.KEY_MIME);
-            if (audio) {
-                if (mime.startsWith("audio/")) {
-                    return i;
-                }
-            } else {
-                if (mime.startsWith("video/")) {
-                    return i;
-                }
-            }
-        }
-        return -5;
     }
 
 }

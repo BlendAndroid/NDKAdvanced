@@ -25,7 +25,7 @@ public class PcmToWavUtil {
     /**
      * @param sampleRate    sample rate、采样率
      * @param channelConfig channel、声道
-     * @param encoding      Audio data format、音频格式
+     * @param encoding      Audio data format、音频格式,采样精度
      */
     public PcmToWavUtil(int sampleRate, int channelConfig, int channelCount, int encoding) {
         this.mSampleRate = sampleRate;
@@ -36,7 +36,7 @@ public class PcmToWavUtil {
     }
 
     /**
-     * pcm文件转wav文件
+     * pcm文件转wav文件,
      *
      * @param inFilename  源文件路径
      * @param outFilename 目标文件路径
@@ -69,6 +69,8 @@ public class PcmToWavUtil {
     }
 
     /**
+     * 一般通过麦克风采集的录音数据都是PCM格式的，即不包含头部信息，播放器无法知道音频采样率、位宽等参数，导致无法播放，
+     * 显然是非常不方便的。pcm转换成wav，我们只需要在pcm的文件起始位置加上至少44个字节的WAV头信息即可。
      * 加入wav文件头
      */
     private void writeWaveFileHeader(FileOutputStream out, long totalAudioLen,

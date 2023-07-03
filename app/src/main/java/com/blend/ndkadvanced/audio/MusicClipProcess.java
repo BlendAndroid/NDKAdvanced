@@ -106,13 +106,13 @@ public class MusicClipProcess {
                 mediaExtractor.advance();
             }
 
-            outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 100_000);
+            outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 1_000);
             while (outputBufferIndex >= 0) {
                 ByteBuffer decodeOutputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
                 // 输入到pcm
                 writeChannel.write(decodeOutputBuffer);
                 mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
-                outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 100_000);
+                outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 1_000);
             }
         }
         writeChannel.close();
