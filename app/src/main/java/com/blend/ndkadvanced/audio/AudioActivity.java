@@ -152,11 +152,12 @@ public class AudioActivity extends AppCompatActivity {
             }
         });
 
+        // TODO 这两个视频的音频不兼容
         mBinding.mixVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String videoPath1 = new File(getExternalCacheDir(), "video.mp4").getAbsolutePath();
-                final String videoPath2 = new File(getExternalCacheDir(), "input.mp4").getAbsolutePath();
+                final String videoPath1 = new File(getExternalCacheDir(), "input.mp4").getAbsolutePath();
+                final String videoPath2 = new File(getExternalCacheDir(), "video.mp4").getAbsolutePath();
                 final String mixVideo = new File(getExternalCacheDir(), "mixVideo.mp4").getAbsolutePath();
                 new Thread() {
                     @Override

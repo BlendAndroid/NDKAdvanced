@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public class FileUtils {
-    private static final String TAG = "David";
+    private static final String TAG = "FileUtils";
 
     public static void writeBytes(byte[] array) {
         FileOutputStream writer = null;

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 project("ndkadvanced")
+
+add_subdirectory(rtmp)
+
 # add_library(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] [source])
 # 将一组源文件 source 编译出一个库文件，并保存为 libname.so，其中有三种库文件类型，不写的话，默认为 STATIC
 # SHARED: 表示动态库，可以在(Java)代码中使用 System.loadLibrary(name) 动态调用；
@@ -15,6 +18,7 @@ add_library(
         gif/gifalloc.c
         hello/hello_main.cpp
         gif/gif_main.cpp
+        rtmp/rtmp_main.cpp
 )
 
 # find_library(name1 path1 path2 ...) 将一个变量和Android NDK的某个库建立关联关系。
@@ -29,7 +33,8 @@ find_library(jnigraphics-lib jnigraphics)
 target_link_libraries(
         native-lib
         ${jnigraphics-lib}
-        ${log-lib})
+        ${log-lib}
+        librtmp)
 
 #set(变量名 变量值)
 

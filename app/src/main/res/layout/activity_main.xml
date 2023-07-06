@@ -1,86 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btnHelloWorld"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello World"
-        android:textAllCaps="false" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnGif"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Gif"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnHelloWorld"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hello World"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnH264"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="H264编解码"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnGif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gif"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnGolomb"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="哥伦布编码"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnH264"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="H264编解码"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnH265"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="H265编解码"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnGolomb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="哥伦布编码"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnCamera1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Camera1"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnH265"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="H265编解码"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnScreenSharePush"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="屏幕共享推流端"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnCamera1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Camera1"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnScreenSharePlayer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="屏幕共享播放端"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnScreenSharePush"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="屏幕共享推流端"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnVideoChatPush"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="视频通话推流端"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnScreenSharePlayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="屏幕共享播放端"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnVideoChatPlayer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="视频通话播放端"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnVideoChatPush"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="视频通话推流端"
+            android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/btnAudio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="音频"
-        android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnVideoChatPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="视频通话播放端"
+            android:textAllCaps="false" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnAudio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="音频"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnRTMP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RTMP"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+</ScrollView>

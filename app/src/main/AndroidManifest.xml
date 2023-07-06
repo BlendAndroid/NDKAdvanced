@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".rtmp.RTMPActivity"
+            android:label="RTMP" />
+        <activity
             android:name=".audio.AudioActivity"
             android:label="音频" />
         <activity
@@ -68,6 +71,11 @@
             android:foregroundServiceType="mediaProjection" />
         <service
             android:name=".screenshare.push.PushScreenShareService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="mediaProjection" />
+        <service
+            android:name=".rtmp.ScreenLiveService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaProjection" />

@@ -4,7 +4,6 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
-import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -63,9 +62,6 @@ public class VideoAddProcess {
             }
         }
 
-        Log.i(TAG, "appendVideo file1_duration: " + file1_duration);
-
-
         mediaMuxer.start();
 
         int sampleSize;
@@ -81,7 +77,6 @@ public class VideoAddProcess {
             // buffer.get(data);
             // FileUtils.writeBytes(data);
             // FileUtils.writeContent(data);
-            Log.i(TAG, "appendVideo: first video");
 
             info.offset = 0;
             info.size = sampleSize;
@@ -90,8 +85,6 @@ public class VideoAddProcess {
             mediaMuxer.writeSampleData(videoTrackIndex, buffer, info);
             videoExtractor1.advance();
         }
-
-        Log.i(TAG, "appendVideo: 1");
 
         //2.write first audio track into muxer.
         // 解除音频轨道
@@ -103,8 +96,6 @@ public class VideoAddProcess {
         info.presentationTimeUs = 0;
         buffer = ByteBuffer.allocate(500 * 1024);
         while ((sampleSize = videoExtractor1.readSampleData(buffer, 0)) > 0) {
-            Log.i(TAG, "appendVideo: first audio");
-
             // byte[] data = new byte[buffer.remaining()];
             // buffer.get(data);
             // FileUtils.writeBytes(data);
@@ -116,7 +107,6 @@ public class VideoAddProcess {
             mediaMuxer.writeSampleData(audioTrackIndex, buffer, info);
             videoExtractor1.advance();
         }
-        Log.i(TAG, "appendVideo: 2");
 
         //3.write second video track into muxer.
         videoExtractor2.selectTrack(sourceVideoTrack2);
@@ -125,7 +115,6 @@ public class VideoAddProcess {
         info.presentationTimeUs = 0;
         buffer = ByteBuffer.allocate(500 * 1024);
         while ((sampleSize = videoExtractor2.readSampleData(buffer, 0)) > 0) {
-            Log.i(TAG, "appendVideo: second video");
             info.offset = 0;
             info.size = sampleSize;
             info.flags = videoExtractor2.getSampleFlags();
@@ -134,7 +123,6 @@ public class VideoAddProcess {
             mediaMuxer.writeSampleData(videoTrackIndex, buffer, info);
             videoExtractor2.advance();
         }
-        Log.i(TAG, "appendVideo: 3");
 
         //4.write second audio track into muxer.
         videoExtractor2.unselectTrack(sourceVideoTrack2);
@@ -143,7 +131,6 @@ public class VideoAddProcess {
         info.presentationTimeUs = 0;
         buffer = ByteBuffer.allocate(500 * 1024);
         while ((sampleSize = videoExtractor2.readSampleData(buffer, 0)) > 0) {
-            Log.i(TAG, "appendVideo: second audio");
             info.offset = 0;
             info.size = sampleSize;
             info.flags = videoExtractor2.getSampleFlags();
@@ -151,11 +138,11 @@ public class VideoAddProcess {
             mediaMuxer.writeSampleData(audioTrackIndex, buffer, info);
             videoExtractor2.advance();
         }
-        Log.i(TAG, "appendVideo: 4");
 
-        // 在这里加上pps和sps
         videoExtractor1.release();
         videoExtractor2.release();
+
+        // 在这里加上pps和sps
         mediaMuxer.stop();
         mediaMuxer.release();
 

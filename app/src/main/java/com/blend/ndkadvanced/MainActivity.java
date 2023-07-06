@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -16,12 +15,17 @@ import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
 import com.blend.ndkadvanced.h264.H264Activity;
 import com.blend.ndkadvanced.hello.HelloWorldActivity;
+import com.blend.ndkadvanced.rtmp.RTMPActivity;
 import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
 import com.blend.ndkadvanced.screenshare.push.PushScreenShareActivity;
 import com.blend.ndkadvanced.videochat.player.PlayerVideoChatActivity;
 import com.blend.ndkadvanced.videochat.push.PushVideoChatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    static {
+        System.loadLibrary("native-lib");
+    }
 
     private ActivityMainBinding binding;
 
@@ -65,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnAudio.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, AudioActivity.class)));
+
+        binding.btnRTMP.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, RTMPActivity.class));
+        });
 
     }
 
