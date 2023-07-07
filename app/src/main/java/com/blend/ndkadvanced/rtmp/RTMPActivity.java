@@ -50,6 +50,17 @@ public class RTMPActivity extends AppCompatActivity {
             }
         });
 
+        mBinding.btnStopRTMPTOBibi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mScreenShortService != null) {
+                    mScreenShortService.stopLive();
+                    unbindService(mServiceConnection);
+                    mScreenShortService = null;
+                }
+            }
+        });
+
     }
 
 

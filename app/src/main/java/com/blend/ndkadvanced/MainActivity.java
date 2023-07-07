@@ -82,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
         String[] PERMISSIONS = {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA};
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO};
         try {
             //检测是否有写的权限
             int permission = ActivityCompat.checkSelfPermission(MainActivity.this,

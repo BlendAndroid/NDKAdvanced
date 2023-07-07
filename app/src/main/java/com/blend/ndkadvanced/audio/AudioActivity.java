@@ -26,6 +26,7 @@ public class AudioActivity extends AppCompatActivity {
 
     private Runnable runnable;
     private float duration = 0;
+    private AudioRecorderProcess audioRecorderProcess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +179,25 @@ public class AudioActivity extends AppCompatActivity {
                         });
                     }
                 }.start();
+            }
+        });
+
+        mBinding.btnAudioRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mBinding.btnAudioRecord.getText().toString().equals("录音")) {
+                    audioRecorderProcess = new AudioRecorderProcess(AudioActivity.this);
+                    mBinding.btnAudioRecord.setText("正在录音");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            audioRecorderProcess.start();
+                        }
+                    }).start();
+                } else {
+                    audioRecorderProcess.stop();
+                    mBinding.btnAudioRecord.setText("录音");
+                }
             }
         });
     }

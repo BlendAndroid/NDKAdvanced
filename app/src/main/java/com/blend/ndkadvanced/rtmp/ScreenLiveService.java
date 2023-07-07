@@ -16,11 +16,12 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.blend.ndkadvanced.R;
+import com.blend.ndkadvanced.utils.DefaultPoolExecutor;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
 //推送层   维持这样的队列
-public class ScreenLiveService extends Service {
+public class ScreenLiveService extends Service implements Runnable {
 
     private static final String TAG = "ScreenLive";
 
@@ -31,6 +32,12 @@ public class ScreenLiveService extends Service {
 
     // 正在执行     isLive    关闭
     private boolean isLiving;
+
+    private String url;
+
+    private VideoCodec videoCodec;
+
+    private AudioCodec audioCodec;
 
     private ScreenLiveBinder mShareBinder;
 
@@ -104,6 +111,52 @@ public class ScreenLiveService extends Service {
         return mShareBinder;
     }
 
+    @Override
+    public void run() {
+        //1推送到
+        if (!connect(url)) {
+            Log.i(TAG, "run: ----------->推送失败");
+            return;
+        }
+//        开启线程
+//
+        videoCodec = new VideoCodec(ScreenLiveService.this);
+        videoCodec.startLive(mediaProjection);
+
+        audioCodec = new AudioCodec(ScreenLiveService.this);
+        audioCodec.startLive();
+
+        isLiving = true;
+        while (isLiving) {
+            RTMPPackage rtmpPackage = null;
+            try {
+                rtmpPackage = queue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+//
+            if (rtmpPackage.getBuffer() != null && rtmpPackage.getBuffer().length != 0) {
+                Log.i(TAG, "run: ----------->推送 " + rtmpPackage.getBuffer().length);
+
+                sendData(rtmpPackage.getBuffer(), rtmpPackage.getBuffer()
+                        .length, rtmpPackage.getTms(), rtmpPackage.getType());
+            }
+
+
+//            消费者
+        }
+    }
+
+    public void stopLive() {
+        isLiving = false;
+        if (videoCodec != null) {
+            videoCodec.stopLive();
+        }
+        if (audioCodec != null) {
+            audioCodec.stopLive();
+        }
+    }
+
     protected class ScreenLiveBinder extends Binder {
         public ScreenLiveService getService() {
             return ScreenLiveService.this;
@@ -121,42 +174,11 @@ public class ScreenLiveService extends Service {
     //    开启 推送模式
     public void startLive(String url, MediaProjection mediaProjection) {
         this.mediaProjection = mediaProjection;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //1推送到
-                if (!connect(url)) {
-                    Log.i(TAG, "run: ----------->推送失败");
-                    return;
-                }
-//        开启线程
-//
-                VideoCodec videoCodec = new VideoCodec(ScreenLiveService.this);
-                videoCodec.startLive(mediaProjection);
-                isLiving = true;
-                while (isLiving) {
-                    RTMPPackage rtmpPackage = null;
-                    try {
-                        rtmpPackage = queue.take();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-//
-                    if (rtmpPackage.getBuffer() != null && rtmpPackage.getBuffer().length != 0) {
-                        Log.i(TAG, "run: ----------->推送 " + rtmpPackage.getBuffer().length);
-
-                        sendData(rtmpPackage.getBuffer(), rtmpPackage.getBuffer()
-                                .length, rtmpPackage.getTms());
-                    }
-
-
-//            消费者
-                }
-            }
-        }).start();
+        this.url = url;
+        DefaultPoolExecutor.getInstance().execute(this);
     }
 
-    private native boolean sendData(byte[] data, int len, long tms);
+    private native boolean sendData(byte[] data, int len, long tms, int type);
 
     private native boolean connect(String url);
 

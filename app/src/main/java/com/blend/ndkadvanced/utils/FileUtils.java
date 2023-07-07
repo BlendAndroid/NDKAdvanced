@@ -22,7 +22,6 @@ public class FileUtils {
             writer.write(array);
             writer.write('\n');
 
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

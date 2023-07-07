@@ -9,10 +9,12 @@ import android.media.projection.MediaProjection;
 import android.os.Bundle;
 import android.view.Surface;
 
+import com.blend.ndkadvanced.utils.DefaultPoolExecutor;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class VideoCodec extends Thread {
+public class VideoCodec implements Runnable {
     //    录屏工具类
     private MediaProjection mediaProjection;
     //    虚拟的画布
@@ -62,6 +64,7 @@ public class VideoCodec extends Thread {
                 buffer.get(outData);
 //封账javabean
                 RTMPPackage rtmpPackage = new RTMPPackage(outData, (bufferInfo.presentationTimeUs / 1000) - startTime);
+                rtmpPackage.setType(RTMPPackage.RTMP_PACKET_TYPE_VIDEO);
                 screenLive.addPackage(rtmpPackage);
                 mediaCodec.releaseOutputBuffer(index, false);
             }
@@ -75,7 +78,6 @@ public class VideoCodec extends Thread {
         mediaProjection.stop();
         mediaProjection = null;
         startTime = 0;
-
 
     }
 
@@ -109,6 +111,10 @@ public class VideoCodec extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        start();
+        DefaultPoolExecutor.getInstance().execute(this);
+    }
+
+    public void stopLive() {
+        isLiving = false;
     }
 }

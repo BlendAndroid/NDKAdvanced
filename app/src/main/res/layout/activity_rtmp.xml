@@ -12,4 +12,11 @@
         android:layout_height="wrap_content"
         android:text="RTMP向B站推流"
         android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnStopRTMPTOBibi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="结束RTMP向B站推流"
+        android:textAllCaps="false" />
 </LinearLayout>

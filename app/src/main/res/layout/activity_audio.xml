@@ -8,6 +8,13 @@
     tools:context=".audio.AudioActivity">
 
     <Button
+        android:id="@+id/btnAudioRecord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="录音"
+        android:textAllCaps="false" />
+
+    <Button
         android:id="@+id/btnAudioClip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
