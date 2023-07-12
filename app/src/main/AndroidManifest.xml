@@ -18,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".camerax.CameraXActivity"
+            android:label="CameraX" />
+        <activity
+            android:name=".x264.X264Activity"
+            android:label="X264" />
+        <activity
             android:name=".rtmp.RTMPActivity"
             android:label="RTMP" />
         <activity

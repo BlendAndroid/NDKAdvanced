@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.blend.ndkadvanced.audio.AudioActivity;
 import com.blend.ndkadvanced.camera1.Camera1Activity;
+import com.blend.ndkadvanced.camerax.CameraXActivity;
 import com.blend.ndkadvanced.databinding.ActivityMainBinding;
 import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
@@ -20,6 +21,7 @@ import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
 import com.blend.ndkadvanced.screenshare.push.PushScreenShareActivity;
 import com.blend.ndkadvanced.videochat.player.PlayerVideoChatActivity;
 import com.blend.ndkadvanced.videochat.push.PushVideoChatActivity;
+import com.blend.ndkadvanced.x264.X264Activity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,6 +74,14 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnRTMP.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, RTMPActivity.class));
+        });
+
+        binding.btnX264.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, X264Activity.class));
+        });
+
+        binding.btnCameraX.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, CameraXActivity.class));
         });
 
     }

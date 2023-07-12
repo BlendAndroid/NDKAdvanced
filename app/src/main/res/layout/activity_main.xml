@@ -94,5 +94,19 @@
             android:text="RTMP"
             android:textAllCaps="false" />
 
+        <Button
+            android:id="@+id/btnX264"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="X264"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnCameraX"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CameraX"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 </ScrollView>
