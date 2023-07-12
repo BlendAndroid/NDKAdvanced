@@ -29,4 +29,9 @@ public class LivePusher {
     public native void native_pushVideo(byte[] data);
 
     public native void native_release();
+
+    public native int init_audioEnc(int sampleRate, int channels);
+
+    public native void native_sendAudio(byte[] buffer, int len);
+
 }

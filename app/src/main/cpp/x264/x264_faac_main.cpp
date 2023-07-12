@@ -5,13 +5,15 @@
 #include "VideoChannel.h"
 #include "blendlog.h"
 #include "safe_queue.h"
+#include "AudioChannel.h"
 
 extern "C" {
 #include "../rtmp/rtmp.h"
 }
 
-VideoChannel *videoChannel = 0;
-JavaCallHelper *helper = 0;
+VideoChannel *videoChannel = nullptr;
+AudioChannel *audioChannel = nullptr;
+JavaCallHelper *helper = nullptr;
 int isStart = 0;
 //记录子线程的对象
 pthread_t pid;
@@ -86,6 +88,11 @@ void *start(void *args) {
         //记录一个开始推流的时间
         start_time = RTMP_GetTime();
         packets.setWork(1);
+
+        // 获取到头帧,开始发送
+        RTMPPacket *audioHeader = audioChannel->getAudioConfig();
+        callBack(audioHeader);
+
         RTMPPacket *packet = 0;
         //循环从队列取包 然后发送
         while (isStart) {
@@ -176,14 +183,44 @@ Java_com_blend_ndkadvanced_x264_LivePusher_native_1release(JNIEnv *env, jobject 
     if (rtmp) {
         RTMP_Close(rtmp);
         RTMP_Free(rtmp);
-        rtmp = 0;
+        rtmp = nullptr;
     }
     if (videoChannel) {
         delete (videoChannel);
-        videoChannel = 0;
+        videoChannel = nullptr;
+    }
+    if (audioChannel) {
+        delete (audioChannel);
+        audioChannel = nullptr;
     }
     if (helper) {
         delete (helper);
-        helper = 0;
+        helper = nullptr;
     }
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_blend_ndkadvanced_x264_LivePusher_init_1audioEnc(JNIEnv *env, jobject thiz,
+                                                          jint sample_rate, jint channels) {
+    //    初始化faac编码  音频
+    audioChannel = new AudioChannel();
+    audioChannel->setCallback(callBack);
+    audioChannel->openCodec(sample_rate, channels);
+    return audioChannel->getInputByteNum();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_blend_ndkadvanced_x264_LivePusher_native_1sendAudio(JNIEnv *env, jobject thiz,
+                                                             jbyteArray buffer, jint len) {
+    if (!audioChannel || !readyPushing) {
+        return;
+    }
+//C层的字节数组
+    jbyte *data = env->GetByteArrayElements(buffer, 0);
+
+    audioChannel->encode(reinterpret_cast<int32_t *>(data), len);
+//    释放掉
+    env->ReleaseByteArrayElements(buffer, data, 0);
 }

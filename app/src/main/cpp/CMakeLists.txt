@@ -6,10 +6,13 @@ add_subdirectory(rtmp)
 
 #配置x264
 file(GLOB x264_source ./x264/*.cpp)
-#头文件成功引入
+#x264和faac头文件引入
 include_directories(${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/include)
-#静态库 FFmpeg
+include_directories(${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/include)
+
+#x264和faac静态库
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/lib")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/lib")
 
 
 # add_library(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] [source])
@@ -44,7 +47,8 @@ target_link_libraries(
         ${jnigraphics-lib}
         ${log-lib}
         librtmp
-        x264)
+        x264
+        faac)
 
 #set(变量名 变量值)
 

@@ -21,7 +21,7 @@
             android:name=".camerax.CameraXActivity"
             android:label="CameraX" />
         <activity
-            android:name=".x264.X264Activity"
+            android:name=".x264.X264AndFaacActivity"
             android:label="X264" />
         <activity
             android:name=".rtmp.RTMPActivity"

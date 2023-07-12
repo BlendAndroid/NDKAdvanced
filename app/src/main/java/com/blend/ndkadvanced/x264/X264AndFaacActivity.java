@@ -7,11 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.blend.ndkadvanced.databinding.ActivityX264Binding;
 
-public class X264Activity extends AppCompatActivity {
+public class X264AndFaacActivity extends AppCompatActivity {
 
     private ActivityX264Binding mBinding;
     private LivePusher livePusher;
     private CameraXHelper mCameraXHelper;
+    private AudioChannel audioChannel;
 
     private static final String rtspHost = "rtmp://live-push.bilivideo.com/live-bvc/";
     private static final String streamKey = "?streamname=live_7207055_19149350&key=f12a84dbf19c61111ab813216c5dfcf1&schedule=rtmp&pflag=1";
@@ -26,6 +27,7 @@ public class X264Activity extends AppCompatActivity {
         livePusher = new LivePusher();
 
         mCameraXHelper = new CameraXHelper(this, mBinding.x264TextureView, livePusher);
+        audioChannel = new AudioChannel(44100, 2, livePusher);
 //        链接B站
         livePusher.startLive(url);
 
@@ -40,6 +42,7 @@ public class X264Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCameraXHelper.startLive();
+                audioChannel.start();
             }
         });
 
@@ -47,6 +50,7 @@ public class X264Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCameraXHelper.stopLive();
+                audioChannel.stop();
             }
         });
     }

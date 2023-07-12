@@ -21,7 +21,7 @@ import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
 import com.blend.ndkadvanced.screenshare.push.PushScreenShareActivity;
 import com.blend.ndkadvanced.videochat.player.PlayerVideoChatActivity;
 import com.blend.ndkadvanced.videochat.push.PushVideoChatActivity;
-import com.blend.ndkadvanced.x264.X264Activity;
+import com.blend.ndkadvanced.x264.X264AndFaacActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.btnX264.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, X264Activity.class));
+            startActivity(new Intent(MainActivity.this, X264AndFaacActivity.class));
         });
 
         binding.btnCameraX.setOnClickListener(v -> {
