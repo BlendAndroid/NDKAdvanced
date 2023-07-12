@@ -4,6 +4,14 @@ project("ndkadvanced")
 
 add_subdirectory(rtmp)
 
+#配置x264
+file(GLOB x264_source ./x264/*.cpp)
+#头文件成功引入
+include_directories(${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/include)
+#静态库 FFmpeg
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/lib")
+
+
 # add_library(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] [source])
 # 将一组源文件 source 编译出一个库文件，并保存为 libname.so，其中有三种库文件类型，不写的话，默认为 STATIC
 # SHARED: 表示动态库，可以在(Java)代码中使用 System.loadLibrary(name) 动态调用；
@@ -19,6 +27,7 @@ add_library(
         hello/hello_main.cpp
         gif/gif_main.cpp
         rtmp/rtmp_main.cpp
+        ${x264_source}
 )
 
 # find_library(name1 path1 path2 ...) 将一个变量和Android NDK的某个库建立关联关系。
@@ -34,7 +43,8 @@ target_link_libraries(
         native-lib
         ${jnigraphics-lib}
         ${log-lib}
-        librtmp)
+        librtmp
+        x264)
 
 #set(变量名 变量值)
 
