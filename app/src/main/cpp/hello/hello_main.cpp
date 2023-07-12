@@ -30,19 +30,19 @@ static const JNINativeMethod gMethods[] = {
 
 // 实现动态注册，利用 RegisterNatives 方法来注册 java 方法与 JNI 函数的一一对应关系；
 // 实现 JNI_OnLoad 方法，在加载动态库后，执行动态注册
-JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    // 答应log_info的日志
-    __android_log_print(ANDROID_LOG_INFO, "native", "Jni_OnLoad");
-    // 定义一个指针，获取env的值，第二个参数是JNI的版本
-    JNIEnv *env = nullptr;
-    if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_4) != JNI_OK) {
-        return -1;
-    }
-
-    // 调用 FindClass 方法，获取 java 对象
-    jclass clazz = env->FindClass("com/blend/ndkadvanced/hello/HelloWorldActivity");
-
-    // 调用 RegisterNatives 方法，传入 java 对象，以及 JNINativeMethod 数组，以及注册数目完成注册
-    env->RegisterNatives(clazz, gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
-    return JNI_VERSION_1_4;
-}
+//JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+//    // 答应log_info的日志
+//    __android_log_print(ANDROID_LOG_INFO, "native", "Jni_OnLoad");
+//    // 定义一个指针，获取env的值，第二个参数是JNI的版本
+//    JNIEnv *env = nullptr;
+//    if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_4) != JNI_OK) {
+//        return -1;
+//    }
+//
+//    // 调用 FindClass 方法，获取 java 对象
+//    jclass clazz = env->FindClass("com/blend/ndkadvanced/hello/HelloWorldActivity");
+//
+//    // 调用 RegisterNatives 方法，传入 java 对象，以及 JNINativeMethod 数组，以及注册数目完成注册
+//    env->RegisterNatives(clazz, gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
+//    return JNI_VERSION_1_4;
+//}
