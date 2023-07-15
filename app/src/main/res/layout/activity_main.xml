@@ -108,5 +108,19 @@
             android:text="CameraX"
             android:textAllCaps="false" />
 
+        <Button
+            android:id="@+id/btnOpenGL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OpenGL"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="滤镜"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 </ScrollView>

@@ -12,10 +12,12 @@ import com.blend.ndkadvanced.audio.AudioActivity;
 import com.blend.ndkadvanced.camera1.Camera1Activity;
 import com.blend.ndkadvanced.camerax.CameraXActivity;
 import com.blend.ndkadvanced.databinding.ActivityMainBinding;
+import com.blend.ndkadvanced.filter.CameraFilterActivity;
 import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
 import com.blend.ndkadvanced.h264.H264Activity;
 import com.blend.ndkadvanced.hello.HelloWorldActivity;
+import com.blend.ndkadvanced.opengl.OpenGLActivity;
 import com.blend.ndkadvanced.rtmp.RTMPActivity;
 import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
 import com.blend.ndkadvanced.screenshare.push.PushScreenShareActivity;
@@ -84,6 +86,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, CameraXActivity.class));
         });
 
+        binding.btnOpenGL.setOnClickListener(v -> {
+                    startActivity(new Intent(MainActivity.this, OpenGLActivity.class));
+                }
+        );
+
+        binding.btnFilter.setOnClickListener(v -> {
+                    startActivity(new Intent(MainActivity.this, CameraFilterActivity.class));
+                }
+        );
     }
 
     public void verifyStoragePermissions() {

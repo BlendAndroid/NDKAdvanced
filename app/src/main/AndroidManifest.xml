@@ -18,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".filter.CameraFilterActivity"
+            android:label="滤镜" />
+        <activity
+            android:name=".opengl.OpenGLActivity"
+            android:label="OpenGL" />
+        <activity
             android:name=".camerax.CameraXActivity"
             android:label="CameraX" />
         <activity
