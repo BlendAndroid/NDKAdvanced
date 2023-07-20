@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".NdkApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
+        <activity android:name=".fbo.FBOActivity"></activity>
         <activity
             android:name=".filter.CameraFilterActivity"
             android:label="滤镜" />

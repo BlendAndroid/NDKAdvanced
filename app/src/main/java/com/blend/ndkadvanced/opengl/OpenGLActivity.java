@@ -21,12 +21,17 @@ public class OpenGLActivity extends AppCompatActivity {
         // setEGLContextClientVersion ()设置OpenGL的版本，如果设置为2，则表示使用OpenGL2.0的渲染接口
         mBinding.glSurfaceView.setEGLContextClientVersion(2);
         // 设置渲染器
-        mBinding.glSurfaceView.setRenderer(new TriangleRender());
+        // mBinding.glSurfaceView.setRenderer(new TriangleRender());
+        // mBinding.glSurfaceView.setRenderer(new TriangleWithCameraRender());
+        mBinding.glSurfaceView.setRenderer(new TriangleColorRender());
+        // mBinding.glSurfaceView.setRenderer(new SquareRender());
+        // mBinding.glSurfaceView.setRenderer(new PictureRender(this));
+
         /*渲染方式，RENDERMODE_WHEN_DIRTY表示被动渲染，只有在调用requestRender或者onResume等方法时才会进行渲染。RENDERMODE_CONTINUOUSLY表示持续渲染*/
         // 设置渲染模式为渲染模式为RENDERMODE_WHEN_DIRTY
         mBinding.glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        mBinding.btnOpenGLTriangle.setOnClickListener(v -> {
+        mBinding.btnOpenGLChange.setOnClickListener(v -> {
 
 
         });
@@ -35,6 +40,7 @@ public class OpenGLActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // 生命周期对GLSurfaceView做处理
         mBinding.glSurfaceView.onResume();
     }
 

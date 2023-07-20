@@ -7,10 +7,10 @@
     tools:context=".opengl.OpenGLActivity">
 
     <Button
-        android:id="@+id/btnOpenGLTriangle"
+        android:id="@+id/btnOpenGLChange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Triangle"
+        android:text="改变"
         android:textAllCaps="false" />
 
     <android.opengl.GLSurfaceView
