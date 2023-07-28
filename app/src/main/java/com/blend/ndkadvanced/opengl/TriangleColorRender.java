@@ -172,7 +172,6 @@ public class TriangleColorRender implements GLSurfaceView.Renderer {
         GLES20.glEnableVertexAttribArray(mColorHandle);
         // 绑定color的坐标值
         // 用于指定顶点属性数据的格式，告诉 OpenGL ES 顶点数据存储的方式，以便它正确地解析和使用这些数据。
-        //
         GLES20.glVertexAttribPointer(mColorHandle, COLOR, GLES20.GL_FLOAT, false, 0, colorBuffer);
 
         // 在绘制的时候为 uMVPMatrix 赋值

@@ -139,6 +139,7 @@ public class SquareRender implements GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMVPMatrix, 0);
 
         // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
+        // 索引法绘制正方形
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,
                 GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
