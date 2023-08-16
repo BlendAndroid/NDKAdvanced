@@ -27,8 +27,8 @@ public class OpenGLActivity extends AppCompatActivity {
         // mBinding.glSurfaceView.setRenderer(new SquareRender());  // 正方形
         // mBinding.glSurfaceView.setRenderer(new OvalRender());    // 圆形
         // mBinding.glSurfaceView.setRenderer(new CubeRender());    // 立方体
-        mBinding.glSurfaceView.setRenderer(new ConeRender(this));   //圆锥
-        // mBinding.glSurfaceView.setRenderer(new PictureRender(this));
+        // mBinding.glSurfaceView.setRenderer(new ConeRender(this));   //圆锥
+        mBinding.glSurfaceView.setRenderer(new PictureRender(this));    //纹理贴图之显示图片
 
         /*渲染方式，RENDERMODE_WHEN_DIRTY表示被动渲染，只有在调用requestRender或者onResume等方法时才会进行渲染。RENDERMODE_CONTINUOUSLY表示持续渲染*/
         // 设置渲染模式为渲染模式为RENDERMODE_WHEN_DIRTY
