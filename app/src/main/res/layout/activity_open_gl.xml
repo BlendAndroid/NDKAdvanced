@@ -20,4 +20,12 @@
         android:text="图片滤镜"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btnOpenGLVary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="图形变换"
+        android:textAllCaps="false" />
+
+
 </LinearLayout>

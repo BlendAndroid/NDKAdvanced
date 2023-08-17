@@ -15,6 +15,7 @@ import com.blend.ndkadvanced.databinding.ActivityOpenGlBinding;
 import com.blend.ndkadvanced.opengl.base.BaseOpenGlLActivity;
 import com.blend.ndkadvanced.opengl.picture.PictureFilterActivity;
 import com.blend.ndkadvanced.opengl.picture.PictureFilterRender;
+import com.blend.ndkadvanced.opengl.vary.VaryOpenGLActivity;
 
 public class OpenGLActivity extends AppCompatActivity {
 
@@ -36,6 +37,13 @@ public class OpenGLActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(OpenGLActivity.this, PictureFilterActivity.class));
+            }
+        });
+
+        mBinding.btnOpenGLVary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(OpenGLActivity.this, VaryOpenGLActivity.class));
             }
         });
     }

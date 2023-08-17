@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 import com.blend.ndkadvanced.R;
-import com.blend.ndkadvanced.opengl.base.OvalRender;
 import com.blend.ndkadvanced.utils.OpenGLUtils;
 
 import java.nio.ByteBuffer;
@@ -65,7 +64,7 @@ public class ConeRender implements GLSurfaceView.Renderer {
         vertexBuffer.position(0);
 
         String vertexShaderString = OpenGLUtils.readRawTextFile(context, R.raw.cone_vert);
-        String fragShaderString = OpenGLUtils.readRawTextFile(context, R.raw.cone_frag);
+        String fragShaderString = OpenGLUtils.readRawTextFile(context, R.raw.default_frag);
 
         // 加载顶点着色器和片元着色器的Shader代码
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderString);
