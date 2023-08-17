@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blend.ndkadvanced.databinding.ActivityBaseOpenGlLactivityBinding;
-import com.blend.ndkadvanced.opengl.picture.PictureRender;
 
 public class BaseOpenGlLActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.blend.ndkadvanced.opengl.picture;
+package com.blend.ndkadvanced.opengl.base;
 
 import android.content.Context;
 import android.graphics.Bitmap;

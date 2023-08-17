@@ -10,6 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.blend.ndkadvanced.databinding.ActivityPictureFilterOpenGlBinding;
 
+/**
+ * 处理一半的情况:
+ * 关键在于if(aPos.x>0.0||vIsHalf==0){..}，
+ * 如果全部处理，vIsHalf=0，括号里的表达式恒等于true，也就是所有的点都处理。
+ * vIsHalf=1，那么只有当aPos.x>0.0部分的点才会被处理，以屏幕中心点为顶点原点坐标，右半边的点才会被处理，就实现了一半效果
+ */
 public class PictureFilterActivity extends AppCompatActivity {
 
     private ActivityPictureFilterOpenGlBinding mBinding;
