@@ -7,15 +7,17 @@
     tools:context=".opengl.OpenGLActivity">
 
     <Button
-        android:id="@+id/btnOpenGLChange"
+        android:id="@+id/btnOpenGLBase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="改变"
+        android:text="基本图形"
         android:textAllCaps="false" />
 
-    <android.opengl.GLSurfaceView
-        android:id="@+id/glSurfaceView"
+    <Button
+        android:id="@+id/btnOpenGLPicture"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:text="图片滤镜"
+        android:textAllCaps="false" />
 
 </LinearLayout>

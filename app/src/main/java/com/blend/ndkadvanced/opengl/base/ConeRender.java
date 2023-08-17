@@ -1,13 +1,12 @@
-package com.blend.ndkadvanced.opengl;
+package com.blend.ndkadvanced.opengl.base;
 
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.util.Log;
 
-import com.blend.ndkadvanced.NdkApplication;
 import com.blend.ndkadvanced.R;
+import com.blend.ndkadvanced.opengl.base.OvalRender;
 import com.blend.ndkadvanced.utils.OpenGLUtils;
 
 import java.nio.ByteBuffer;

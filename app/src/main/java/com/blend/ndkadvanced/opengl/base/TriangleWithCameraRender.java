@@ -1,4 +1,4 @@
-package com.blend.ndkadvanced.opengl;
+package com.blend.ndkadvanced.opengl.base;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;

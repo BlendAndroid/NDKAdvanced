@@ -1,4 +1,4 @@
-package com.blend.ndkadvanced.opengl;
+package com.blend.ndkadvanced.opengl.picture;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,6 +8,9 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
+import com.blend.ndkadvanced.R;
+import com.blend.ndkadvanced.utils.OpenGLUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -16,51 +19,12 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-/**
- * 启用纹理映射后，如果想把一幅纹理映射到相应的几何图元，就必须告诉GPU如何进行纹理映射，也就是为图元的顶点指定恰当的纹理坐标。
- * 2D纹理坐标在x和y轴上，范围为0到1之间。使用纹理坐标获取纹理颜色叫做采样(Sampling)。纹理坐标起始于(0, 0)，也就是纹理图片
- * 的左下角，终始于(1, 1)，即纹理图片的右上角。
- * <p>
- * `sampler2D` 是 GLSL 中的一种变量类型，用于表示 2D 纹理对象。它可以在片段着色器中使用，将纹理图像映射到几何形状的表面上，
- * 实现纹理贴图的效果。
- * `sampler2D` 通常与纹理坐标一起使用，纹理坐标指定图像中的一个特定点，而 `sampler2D` 则表示该点的颜色值。在片段着色器中，
- * 可以使用 `texture2D` 函数来获取 `sampler2D` 中的颜色值。
- * <p>
- * public static void glGenTextures(int n, int[] textures, int offset);
- * `n` 参数指定要生成的纹理对象数量，
- * `textures` 参数是一个整型数组，用于存储生成的纹理对象的名称，
- * `offset` 参数表示从数组的哪个位置开始存储。
- * 将纹理坐标映射到顶点坐标
- */
-public class PictureRender implements GLSurfaceView.Renderer {
+public class PictureFilterRender implements GLSurfaceView.Renderer {
 
     private int mProgram;
     private FloatBuffer mTexVertexBuffer;
     private FloatBuffer mVertexBuffer;
     private ShortBuffer mVertexIndexBuffer;
-
-    // a_texCoord 是纹理坐标，它是一个二维向量，由 u 和 v 两个分量组成，分别表示横向和纵向的纹理坐标。
-    private final String vertexShaderCode =
-            "uniform mat4 uMVPMatrix;" +
-                    "attribute vec4 vPosition;" +
-                    "attribute vec2 a_texCoord;" +
-                    "varying vec2 v_texCoord;" +
-                    "void main() {" +
-                    " gl_Position = uMVPMatrix * vPosition;" +
-                    " v_texCoord = a_texCoord;" +
-                    "}";
-
-    // 片元着色器代码，就是Fragment Shader
-    // 通过 varying 关键字，将 v_texCoord 变量从顶点着色器传递到片元着色器
-    // sampler2D，是GLSL的变量类型之一的取样器。texture2D也有提到，它是GLSL的内置函数，
-    // 用于2D纹理取样，根据纹理取样器和纹理坐标，可以得到当前纹理取样得到的像素颜色。
-    private final String fragmentShaderCode =
-            "precision mediump float;" +
-                    "varying vec2 v_texCoord;" +
-                    "uniform sampler2D s_texture;" +
-                    "void main() {" +
-                    " gl_FragColor = texture2D(s_texture, v_texCoord);" +
-                    "}";
 
     // 这里定义为16,是因为是一个4 * 4的矩阵
     private final float[] mMVPMatrix = new float[16];
@@ -68,7 +32,6 @@ public class PictureRender implements GLSurfaceView.Renderer {
     private int mPositionHandle;
     private int mTexCoordHandle;
     private int mTexSamplerHandle;
-
     private int mMatrixHandle;
 
     // VERTEX 保存了 4 个顶点的坐标，VERTEX_INDEX 保存了顶点的绘制顺序。
@@ -95,8 +58,26 @@ public class PictureRender implements GLSurfaceView.Renderer {
     private final Context mContext;
     private int mTexName;
 
-    public PictureRender(Context context) {
+    private Filter mFilter = Filter.NONE;
+
+    private int filterType;
+
+    private int filterColor;
+
+    private int filterIsHalf;
+
+    private int filterXY;
+
+    private boolean isHalf;
+
+    private float uXY;
+
+    public PictureFilterRender(Context context) {
         mContext = context;
+    }
+
+    public void setFilterType(Filter filter) {
+        mFilter = filter;
     }
 
     @Override
@@ -125,9 +106,12 @@ public class PictureRender implements GLSurfaceView.Renderer {
 
         // 完成上面的步骤，顺利地将float[]转为了FloatBuffer，后面绘制三角形的时候，直接通过成员变量vertexBuffer即可。
 
+        String vertexShaderString = OpenGLUtils.readRawTextFile(mContext, R.raw.picture_filter_vert);
+        String fragShaderString = OpenGLUtils.readRawTextFile(mContext, R.raw.picture_filter_frag);
+
         // 加载顶点着色器和片元着色器的Shader代码
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderString);
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragShaderString);
         //创建一个空的OpenGLES程序
         mProgram = GLES20.glCreateProgram();
         //将顶点着色器加入到OpenGLES程序
@@ -141,9 +125,14 @@ public class PictureRender implements GLSurfaceView.Renderer {
 
         //获取 shader 代码中的变量索引(句柄)
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
-        mTexCoordHandle = GLES20.glGetAttribLocation(mProgram, "a_texCoord");
-        mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
-        mTexSamplerHandle = GLES20.glGetUniformLocation(mProgram, "s_texture");
+        mTexCoordHandle = GLES20.glGetAttribLocation(mProgram, "vCoordinate");
+        mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "vMatrix");
+        mTexSamplerHandle = GLES20.glGetUniformLocation(mProgram, "vTexture");
+
+        filterType = GLES20.glGetUniformLocation(mProgram, "vChangeType");
+        filterColor = GLES20.glGetUniformLocation(mProgram, "vChangeColor");
+        filterIsHalf = GLES20.glGetUniformLocation(mProgram, "vIsHalf");
+        filterXY = GLES20.glGetUniformLocation(mProgram, "uXY");
 
         // 启动句柄
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -216,6 +205,8 @@ public class PictureRender implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         gl.glViewport(0, 0, width, height);
 
+        uXY = width / (float) height;
+
         // 计算变换矩阵
         // 透视投影,m 是保存变换矩阵的数组，offset 是开始保存的下标偏移量
         // fovy 是 y 轴的 field of view 值，也就是视角大小，视角越大，看到的范围就越广
@@ -244,6 +235,15 @@ public class PictureRender implements GLSurfaceView.Renderer {
         // 在绘制的时候为 uMVPMatrix 赋值
         GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMVPMatrix, 0);
 
+        // 设置滤镜类型
+        GLES20.glUniform1i(filterType, mFilter.getType());
+        // 设置滤镜的颜色
+        GLES20.glUniform3fv(filterColor, 1, mFilter.data(), 0);
+        // 设置是否处理一半
+        GLES20.glUniform1i(filterIsHalf, isHalf ? 1 : 0);
+        // 设置放大镜效果
+        GLES20.glUniform1f(filterXY, uXY);
+
         // 设置纹理值
         GLES20.glUniform1i(mTexSamplerHandle, 0);
 
@@ -253,5 +253,9 @@ public class PictureRender implements GLSurfaceView.Renderer {
 
         //禁止顶点数组的句柄
         GLES20.glDisableVertexAttribArray(mPositionHandle);
+    }
+
+    public void setHalf(boolean isHalf) {
+        this.isHalf = isHalf;
     }
 }

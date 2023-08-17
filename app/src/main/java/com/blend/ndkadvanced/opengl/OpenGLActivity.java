@@ -1,11 +1,20 @@
 package com.blend.ndkadvanced.opengl;
 
-import android.opengl.GLSurfaceView;
-import android.os.Bundle;
+import static com.blend.ndkadvanced.opengl.base.BaseOpenGlLActivity.BASE_OPEN_GL_ACTIVITY;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blend.ndkadvanced.databinding.ActivityOpenGlBinding;
+import com.blend.ndkadvanced.opengl.base.BaseOpenGlLActivity;
+import com.blend.ndkadvanced.opengl.picture.PictureFilterActivity;
+import com.blend.ndkadvanced.opengl.picture.PictureFilterRender;
 
 public class OpenGLActivity extends AppCompatActivity {
 
@@ -16,41 +25,39 @@ public class OpenGLActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityOpenGlBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+        mBinding.btnOpenGLBase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectBaseType();
+            }
+        });
 
-
-        // setEGLContextClientVersion ()设置OpenGL的版本，如果设置为2，则表示使用OpenGL2.0的渲染接口
-        mBinding.glSurfaceView.setEGLContextClientVersion(2);
-        // 设置渲染器
-        // mBinding.glSurfaceView.setRenderer(new TriangleRender());
-        // mBinding.glSurfaceView.setRenderer(new TriangleWithCameraRender());
-        // mBinding.glSurfaceView.setRenderer(new TriangleColorRender());
-        // mBinding.glSurfaceView.setRenderer(new SquareRender());  // 正方形
-        // mBinding.glSurfaceView.setRenderer(new OvalRender());    // 圆形
-        // mBinding.glSurfaceView.setRenderer(new CubeRender());    // 立方体
-        // mBinding.glSurfaceView.setRenderer(new ConeRender(this));   //圆锥
-        // mBinding.glSurfaceView.setRenderer(new PictureRender(this));    //纹理贴图之显示图片
-        mBinding.glSurfaceView.setRenderer(new PictureFilterRender(this));    //纹理贴图之滤镜
-
-        /*渲染方式，RENDERMODE_WHEN_DIRTY表示被动渲染，只有在调用requestRender或者onResume等方法时才会进行渲染。RENDERMODE_CONTINUOUSLY表示持续渲染*/
-        // 设置渲染模式为渲染模式为RENDERMODE_WHEN_DIRTY
-        mBinding.glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
-        mBinding.btnOpenGLChange.setOnClickListener(v -> {
-
-
+        mBinding.btnOpenGLPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(OpenGLActivity.this, PictureFilterActivity.class));
+            }
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // 生命周期对GLSurfaceView做处理
-        mBinding.glSurfaceView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mBinding.glSurfaceView.onPause();
+    private void selectBaseType() {
+        String[] selectPicTypeStr = {"三角形", "三角形2", "带颜色的三角形", "正方形", "圆形", "立方体", "圆锥", "纹理贴图之显示图片"};
+        new AlertDialog.Builder(this)
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Toast.makeText(OpenGLActivity.this, "取消", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setItems(selectPicTypeStr, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Intent intent = new Intent(OpenGLActivity.this, BaseOpenGlLActivity.class);
+                        intent.putExtra(BASE_OPEN_GL_ACTIVITY, which);
+                        startActivity(intent);
+                    }
+                })
+                .show();
     }
 }
