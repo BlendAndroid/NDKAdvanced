@@ -61,6 +61,7 @@ public class H264Activity extends AppCompatActivity {
                 // 结束屏幕录制
                 mScreenShortService.stopRecord();
                 unbindService(mServiceConnection);
+                mServiceConnection = null;
             }
         });
     }

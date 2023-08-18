@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+// 需要注意的是，使用 Surface 进行视频编码或解码时，需要保证 Surface 的尺寸与视频的尺寸相匹配，否则可能会导致图像变形或者无法正常播放。
 public class ScreenShortService extends Service {
 
     private static final String TAG = "ScreenShortService";
@@ -128,10 +129,11 @@ public class ScreenShortService extends Service {
         try {
             // 创建编码H264
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
-            // 编码的宽高
+            // 描述视频轨道的 MediaFormat 对象
             MediaFormat format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC,
                     540, 960);
-            // 输入一个surface
+            // 用于指定视频的像素格式, 用于指定使用 Surface 作为输入或输出媒体数据的像素格式
+            // Surface 中的图像数据直接传递给编码器或解码器，而不需要进行任何图像格式的转换操作，从而减少了 CPU 的使用量和数据传输的延迟。
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
 
@@ -142,10 +144,10 @@ public class ScreenShortService extends Service {
             // I帧的间隔,也会根据场景来改变
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);//2s一个I帧
 
-            //编码配置
+            //编码配置, 表示该组件将被用于编码或解码数据
             mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
 
-            // 通过mediaCodec拿到Surface,是一个虚拟的,用于拿到
+            // 通过mediaCodec拿到Surface,是一个虚拟的,用于将图像数据传递给编码器进行编码
             final Surface surface = mediaCodec.createInputSurface();
 
             // 编码是耗时操作
@@ -170,6 +172,8 @@ public class ScreenShortService extends Service {
                         }
 
                         // 拿到解码后的数据，是通过输出缓冲区，返回他的索引，在10ms内解码
+                        // 用于从编码器或解码器的输出缓冲区队列中取出一个可用的输出缓冲区，并返回其索引号
+                        // 输出缓冲区
                         int index = mediaCodec.dequeueOutputBuffer(bufferInfo, 100000);
 
                         Log.i(TAG, "mediaCodec run: " + index);

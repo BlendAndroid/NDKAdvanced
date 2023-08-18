@@ -130,6 +130,7 @@ public class H264Player implements Runnable {
             int nextFrameStart = findByFrame(bytes, startIndex + 2, totalSize);
 
             // 10毫秒内判断是否有可用的缓冲区索引
+            // 输入缓冲区, input就是输入
             int inIndex = mediaCodec.dequeueInputBuffer(10000);
             // 如果Index > 0，就是可用的缓冲区索引
             if (inIndex >= 0) {
@@ -150,7 +151,7 @@ public class H264Player implements Runnable {
 
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
 
-            // 拿到解码后的数据，是通过输出缓冲区，返回他的索引，在10ms内解码
+            // 拿到解码后的数据，是通过输出缓冲区，返回他的索引，在10ms内解码, 这里面保存了视频了信息
             int outIndex = mediaCodec.dequeueOutputBuffer(info, 10000);
             if (outIndex >= 0) {
 
@@ -194,6 +195,7 @@ public class H264Player implements Runnable {
         // 将byteBuffer的数据给了ba
         byteBuffer.get(ba);
 
+        // 用于处理 YUV 格式的图像数据
         YuvImage yuvImage = new YuvImage(ba, ImageFormat.NV21, 368, 384, null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         yuvImage.compressToJpeg(new Rect(0, 0, 368, 384), 100, baos);
