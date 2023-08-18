@@ -14,7 +14,10 @@ class VaryTools {
     private float[] mMatrixCamera = new float[16];    //相机矩阵
     private float[] mMatrixProjection = new float[16];    //投影矩阵
     private float[] mMatrixCurrent =     //原始矩阵
-            {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+                    {1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1};
 
     private final Stack<float[]> mStack;      //变换矩阵堆栈
 
