@@ -25,6 +25,7 @@ class GolombDemo {
         // 0x80是1000 0000
         while (nStartBit < 8) {
             // 进行0x80的右移运算,按位与,找到哥伦布编码的1
+            // 0x80的二进制是1000 0000,右移nStartBit位,就是找到第nStartBit位是1的时候
             if ((data & (0x80 >> (nStartBit))) != 0) {
                 break;
             }

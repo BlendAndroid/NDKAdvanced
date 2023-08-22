@@ -29,7 +29,20 @@ import java.io.IOException;
  * Android Camera对象通过setPreviewCallback 函数，在onPreviewFrame(byte[] data,Camera camera)中回调采集
  * 的数据就是NV21格式。而H264编码的输入数据却为I420格式。因此，当我们采集到摄像头数据之后需要将NV21转为I420。
  * NV21和I420都是属于YUV420格式。而NV21是一种two-plane模式，即Y和UV分为两个Plane(平面)，但是UV（CbCr）交错存储2个平面，
- * 而不是分为三个。这种排列方式被称之为YUV420SP，而I420则称之为YUV420P。(Y:明亮度、灰度，UV:色度、饱和度)
+ * 而不是分为三个。这种排列方式被称之为YUV420SP(Semi-Planar)，而I420则称之为YUV420P(Planar)。(Y:明亮度、灰度，UV:色度、饱和度)
+ * <p>
+ * RGB24使用24位来表示一个像素，RGB分量都用8位表示，取值范围为0-255。在一个2*2的像素区域，RRG暂用的字节数为2*2*3=12字节。
+ * 那么用yuv表示，占用的字节数为4(Y)+1(u)+1(v)=6字节,其中Y占用4个字节，U和V各占用1字节，比例为4:1:1
+ * 所以在一个宽高为w*h的设备上，使用rgb表示编码占用的字节数为w*h*3,使用yuv表示暂用的内存为w*h*+w*h/4+w*h/4 = w*h*3/2.
+ * <p>
+ * 首先需要了解的是yuv有很多编码格式，其中yuv420就是一种，而nv21又是yuv420的一种。并且nv21是针对android设备的视频编码。
+ * nv21编码格式:比如一张1920*1280的图片，经过nv21编码后，会变成前面1920*1280字节全是Y，从1920*1280字节长度开始，
+ * U和V会交替排列，它们的字节长度分别为1920*1280/4。
+ * I420也是YUV420编码格式的一种，由于android手机厂商的原因，摄像头采集到的数据永远都是经过NV21编码的数据，但是对于这种
+ * 数据不能够显示在苹果或windows平台，那么需要对这个编码格式的数据需要重新编码，其中I420这种编码格式，所有的厂商都是适配的。
+ * <p>
+ * I420编码格式:比如一张1920*1280的图片，经过I420编码后，会变成前面1920*1280字节全是Y，从1920*1280字节长度开始，会先排列U，
+ * 总字节长度为1920*1280/4，从1920*1280+1920*1280/4开始排列V，字节长度为1920*1280/4，所以总的字节长度适合NV21一样的，只是UV的编码顺序不一样
  */
 public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
@@ -67,7 +80,7 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
         try {
             // 绑定SurfaceView进行输出
             mCamera.setPreviewDisplay(getHolder());
-            // 旋转90度
+            // 旋转90度, 设置预览的方向
             mCamera.setDisplayOrientation(90);
 
             Log.e(TAG, "startPreview size.width: " + size.width);
@@ -120,6 +133,7 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     // 开始旋转数据，不旋转的话，就是横屏的，顺时针旋转
+    // 将竖屏的数据，旋转成横屏的数据
     private void portraitData2Raw(byte[] data) {
         int width = size.width;
         int height = size.height;
@@ -161,8 +175,9 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
             try {
                 pictureFile.createNewFile();
 
+                // 将NV21数据保存成图片
                 FileOutputStream fileOutputStream = new FileOutputStream(pictureFile);
-                //ImageFormat.NV21 and ImageFormat.YUY2 for now，I420是不支持的
+                // ImageFormat.NV21 and ImageFormat.YUY2 for now，I420是不支持的
                 YuvImage image = new YuvImage(temp, ImageFormat.NV21, size.height, size.width, null);   //将NV21 data保存成YuvImage
                 //图像压缩，将NV21格式图片，以质量100压缩成Jpeg，并得到JPEG数据流
                 image.compressToJpeg(new Rect(0, 0, image.getWidth(), image.getHeight()), 100, fileOutputStream);

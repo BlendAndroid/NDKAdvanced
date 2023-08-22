@@ -115,6 +115,7 @@ public class MediaCodec {
         Log.e(TAG, "width: " + width + "  height: " + height);
     }
 
+    // 截取数组
     private byte[] spliteByte(byte[] array, int start, int lenght) {
         byte[] newArray = new byte[lenght];
         for (int i = start; i < start + lenght; i++) {
