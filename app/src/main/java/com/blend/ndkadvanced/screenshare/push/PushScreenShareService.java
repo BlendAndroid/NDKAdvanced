@@ -136,7 +136,9 @@ public class PushScreenShareService extends Service {
         try {
             int width = 720;
             int height = 1280;
+            // video/hevc就是H265
             MediaFormat format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_HEVC, width, height);
+            // 将Surface作为视频编码的输出
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
             format.setInteger(KEY_BIT_RATE, width * height);
             format.setInteger(KEY_FRAME_RATE, 20);
@@ -188,14 +190,17 @@ public class PushScreenShareService extends Service {
     private void dealFrame(ByteBuffer bb, MediaCodec.BufferInfo bufferInfo) {
         // 偏移量设置是4
         int offset = 4;
+        // 00 00 01也是开头
         if (bb.get(2) == 0x01) {
             offset = 3;
         }
+        // 0x7Ed0  0x7E是1111110
         int type = (bb.get(offset) & 0x7E) >> 1;
-        if (type == NAL_VPS) {
+        if (type == NAL_VPS) {  // 获取到VPS,SPS,PPS
             vps_sps_pps_buf = new byte[bufferInfo.size];
             bb.get(vps_sps_pps_buf);
-        } else if (type == NAL_I) {
+            Log.e(TAG, "VPS,SPS,PPS数据: " + Arrays.toString(vps_sps_pps_buf));
+        } else if (type == NAL_I) { // 每一个I帧的前面加上VPS,SPS,PPS
 
             final byte[] bytes = new byte[bufferInfo.size];
             bb.get(bytes);
@@ -204,11 +209,12 @@ public class PushScreenShareService extends Service {
             System.arraycopy(vps_sps_pps_buf, 0, newBuf, 0, vps_sps_pps_buf.length);
             System.arraycopy(bytes, 0, newBuf, vps_sps_pps_buf.length, bytes.length);
             this.mPushSocketLive.sendData(newBuf);
+            Log.e(TAG, "I帧视频数据: " + Arrays.toString(newBuf));
         } else {
             final byte[] bytes = new byte[bufferInfo.size];
             bb.get(bytes);
             this.mPushSocketLive.sendData(bytes);
-            Log.e(TAG, "视频数据: " + Arrays.toString(bytes));
+            Log.e(TAG, "非I帧视频数据: " + Arrays.toString(bytes));
         }
 
     }

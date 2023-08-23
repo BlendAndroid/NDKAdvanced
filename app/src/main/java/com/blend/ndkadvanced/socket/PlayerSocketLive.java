@@ -9,6 +9,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+// 这个是客户端，用来接收服务端发送过来的数据
 public class PlayerSocketLive implements SocketLive {
     private static final String TAG = "PlayerSocketLive";
 
@@ -22,7 +23,7 @@ public class PlayerSocketLive implements SocketLive {
     @Override
     public void start() {
         try {
-            URI url = new URI("ws://10.221.147.213:12001");
+            URI url = new URI("ws://10.221.150.178:12001");
             myWebSocketClient = new MyWebSocketClient(url);
             myWebSocketClient.connect();
         } catch (Exception e) {

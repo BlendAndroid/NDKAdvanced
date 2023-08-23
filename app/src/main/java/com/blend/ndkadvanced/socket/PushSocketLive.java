@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+// 服务端, 推流端
 public class PushSocketLive implements SocketLive {
 
     private static final String TAG = "PushSocketLive";
