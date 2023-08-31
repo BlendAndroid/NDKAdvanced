@@ -17,6 +17,7 @@ import com.blend.ndkadvanced.utils.RangeSeekBar;
 import java.io.File;
 import java.io.IOException;
 
+
 public class AudioActivity extends AppCompatActivity {
 
     private ActivityAudioBinding mBinding;
@@ -33,6 +34,26 @@ public class AudioActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityAudioBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+
+
+        mBinding.btnAudioRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mBinding.btnAudioRecord.getText().toString().equals("录音")) {
+                    audioRecorderProcess = new AudioRecorderProcess(AudioActivity.this);
+                    mBinding.btnAudioRecord.setText("正在录音");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            audioRecorderProcess.start();
+                        }
+                    }).start();
+                } else {
+                    audioRecorderProcess.stop();
+                    mBinding.btnAudioRecord.setText("录音");
+                }
+            }
+        });
 
         mBinding.btnAudioClip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,8 +88,7 @@ public class AudioActivity extends AppCompatActivity {
 
                             final String mixOutput = new File(getExternalCacheDir(), "mixOutput.mp3").getAbsolutePath();
 
-                            new MusicMixProcess().mixAudioTrack(AudioActivity.this, videoPath, audioPath, mixOutput,
-                                    10 * 1000 * 1000, 15 * 1000 * 1000, 100, 100);
+                            new MusicMixProcess().mixAudioTrack(AudioActivity.this, videoPath, audioPath, mixOutput, 10 * 1000 * 1000, 15 * 1000 * 1000, 100, 100);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -130,14 +150,7 @@ public class AudioActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            VideoAndMusicMixProcess.mixAudioTrack(AudioActivity.this,
-                                    videoFile.getAbsolutePath(),
-                                    audioFile.getAbsolutePath(),
-                                    outputFile.getAbsolutePath(),
-                                    (int) (mBinding.rangeSeekBar.getCurrentRange()[0] * 1000 * 1000),
-                                    (int) (mBinding.rangeSeekBar.getCurrentRange()[1] * 1000 * 1000),
-                                    voiceVolume,
-                                    musicVolume);
+                            VideoAndMusicMixProcess.mixAudioTrack(AudioActivity.this, videoFile.getAbsolutePath(), audioFile.getAbsolutePath(), outputFile.getAbsolutePath(), (int) (mBinding.rangeSeekBar.getCurrentRange()[0] * 1000 * 1000), (int) (mBinding.rangeSeekBar.getCurrentRange()[1] * 1000 * 1000), voiceVolume, musicVolume);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -163,10 +176,7 @@ public class AudioActivity extends AppCompatActivity {
                 new Thread() {
                     @Override
                     public void run() {
-
                         try {
-                            // FileUtils.copyAssets(AudioActivity.this, "video.mp4", videoPath1);
-                            // FileUtils.copyAssets(AudioActivity.this, "input.mp4", videoPath2);
                             VideoAddProcess.appendVideo(videoPath1, videoPath2, mixVideo);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -179,25 +189,6 @@ public class AudioActivity extends AppCompatActivity {
                         });
                     }
                 }.start();
-            }
-        });
-
-        mBinding.btnAudioRecord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mBinding.btnAudioRecord.getText().toString().equals("录音")) {
-                    audioRecorderProcess = new AudioRecorderProcess(AudioActivity.this);
-                    mBinding.btnAudioRecord.setText("正在录音");
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            audioRecorderProcess.start();
-                        }
-                    }).start();
-                } else {
-                    audioRecorderProcess.stop();
-                    mBinding.btnAudioRecord.setText("录音");
-                }
             }
         });
     }
@@ -248,6 +239,4 @@ public class AudioActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

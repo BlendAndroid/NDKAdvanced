@@ -12,9 +12,16 @@ public class VideoAddProcess {
 
     private static final String TAG = "VideoAddProcess";
 
-    //合成视频,不需要编码,但是编辑,剪辑是需要的
+    /**
+     * 合成视频,不需要dsp的编解码,但是编辑,剪辑是需要的
+     *
+     * @param inputPath1 第一个视频文件
+     * @param inputPath2 第二个视频文件
+     * @param outputPath 合成后的视频文件
+     * @throws IOException io异常
+     */
     public static void appendVideo(String inputPath1, String inputPath2, String outputPath) throws IOException {
-        // 新建轨道管理
+        // 新建轨道管理，生成mp4文件
         MediaMuxer mediaMuxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         // 开始解析数据
         MediaExtractor videoExtractor1 = new MediaExtractor();
@@ -23,6 +30,7 @@ public class VideoAddProcess {
         MediaExtractor videoExtractor2 = new MediaExtractor();
         videoExtractor2.setDataSource(inputPath2);
 
+        // 音视频索引值
         int videoTrackIndex = -1;
         int audioTrackIndex = -1;
 
@@ -72,16 +80,11 @@ public class VideoAddProcess {
         info.presentationTimeUs = 0;
         ByteBuffer buffer = ByteBuffer.allocate(500 * 1024);
         while ((sampleSize = videoExtractor1.readSampleData(buffer, 0)) > 0) {
-            // 写入视频信息,还没有写入pps和sps
-            // byte[] data = new byte[buffer.remaining()];
-            // buffer.get(data);
-            // FileUtils.writeBytes(data);
-            // FileUtils.writeContent(data);
-
             info.offset = 0;
             info.size = sampleSize;
             info.flags = videoExtractor1.getSampleFlags();
             info.presentationTimeUs = videoExtractor1.getSampleTime();
+            // 写入视频1信息到混合后的视频轨
             mediaMuxer.writeSampleData(videoTrackIndex, buffer, info);
             videoExtractor1.advance();
         }
@@ -96,10 +99,6 @@ public class VideoAddProcess {
         info.presentationTimeUs = 0;
         buffer = ByteBuffer.allocate(500 * 1024);
         while ((sampleSize = videoExtractor1.readSampleData(buffer, 0)) > 0) {
-            // byte[] data = new byte[buffer.remaining()];
-            // buffer.get(data);
-            // FileUtils.writeBytes(data);
-            // FileUtils.writeContent(data);
             info.offset = 0;
             info.size = sampleSize;
             info.flags = videoExtractor1.getSampleFlags();
@@ -145,6 +144,5 @@ public class VideoAddProcess {
         // 在这里加上pps和sps
         mediaMuxer.stop();
         mediaMuxer.release();
-
     }
 }
