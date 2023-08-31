@@ -17,11 +17,10 @@ public class EncoderPushLiveH265 {
     private MediaCodec mediaCodec;
     int width;
     int height;
-    //    传输 过去
-    private SocketLive socketLive;
-    //    nv21转换成nv12的数据
+    private final SocketLive socketLive;
+    // nv21转换成nv12的数据
     byte[] nv12;
-    //    旋转之后的yuv数据
+    // 旋转之后的yuv数据
     byte[] yuv;
     public static final int NAL_I = 19;
     public static final int NAL_VPS = 32;
@@ -36,22 +35,23 @@ public class EncoderPushLiveH265 {
         this.height = height;
     }
 
-    //    startLive  MActivity
+
     public void startLive() {
-//        实例化编码器  MediaFormat =  hashmap  （key-value）
-//        慢
-        //创建对应编码器
+        // 创建对应编码器
         try {
             mediaCodec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_HEVC);
             MediaFormat mediaFormat = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_HEVC, height, width);
-//            网络 视频通话 直播   固定码率    投屏  +事件
             mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, 2500000);
             mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 15);
+            // COLOR_FormatYUV420Flexible是一种灵活的YUV 420格式
+            // 具体来说，COLOR_FormatYUV420Flexible可以接受以下三种YUV 420数据存储格式的输入：
+            // 1. Planar YUV 420 (YUV420p)(I420)
+            // 2. Semi-Planar YUV 420 with interleaved UV planes (NV12)
+            // 3. Semi-Planar YUV 420 with UV planes in separate blocks (NV21)
             mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
             mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 5); //IDR帧刷新时间
             mediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mediaCodec.start();
-//            周五 总的 新的知识点
             int bufferLength = width * height * 3 / 2;
             nv12 = new byte[bufferLength];
             yuv = new byte[bufferLength];
@@ -61,14 +61,14 @@ public class EncoderPushLiveH265 {
         }
     }
 
-    ///摄像头调用
+    //摄像头数据,开始编码数据
     public int encodeFrame(byte[] input) {
-//        旋转
-//        nv21-nv12
+//        nv21转换为nv12
         nv12 = YuvUtils.nv21toNV12(input);
-//        旋转
+//        将旋转后的数据保存到yuv中
         YuvUtils.portraitData2Raw(nv12, yuv, width, height);
 
+        // 输入到dsp芯片
         int inputBufferIndex = mediaCodec.dequeueInputBuffer(100000);
         if (inputBufferIndex >= 0) {
             ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferIndex);
@@ -78,22 +78,30 @@ public class EncoderPushLiveH265 {
             mediaCodec.queueInputBuffer(inputBufferIndex, 0, yuv.length, presentationTimeUs, 0);
             frameIndex++;
         }
+
+        // 拿到dsp芯片的输出
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
         int outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 100000);
         while (outputBufferIndex >= 0) {
             ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferIndex);
             dealFrame(outputBuffer, bufferInfo);
             mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
+            // 不断的从输出缓冲区拿数据
             outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 0);
         }
         return 0;
     }
 
-    //    1ms=1000us
+    // 1秒（s）= 1000毫秒（ms）
+    // 1毫秒（ms）= 1000微秒（μs）
+    // 1微秒（μs）= 1000纳秒（ns）
+    // 这里的是以微妙为单位, microseconds（μs）
     private long computePresentationTime(long frameIndex) {
-        return 132 + frameIndex * 1000000 / 15;
+        // 偏移132,因为是从第0帧开始的,要偏移,要是刚开始会黑屏一下
+        return 132 + frameIndex * 1_000_000 / 15;   // 15帧每秒
     }
 
+    // 将每个I帧前面加上vps, sps, pps
     private void dealFrame(ByteBuffer bb, MediaCodec.BufferInfo bufferInfo) {
         int offset = 4;
         if (bb.get(2) == 0x01) {

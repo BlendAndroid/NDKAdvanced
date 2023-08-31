@@ -111,6 +111,19 @@ public class ScreenLiveService extends Service implements Runnable {
         return mShareBinder;
     }
 
+    protected class ScreenLiveBinder extends Binder {
+        public ScreenLiveService getService() {
+            return ScreenLiveService.this;
+        }
+    }
+
+    // 开启RTMP推送
+    public void startLive(String url, MediaProjection mediaProjection) {
+        this.mediaProjection = mediaProjection;
+        this.url = url;
+        DefaultPoolExecutor.getInstance().execute(this);
+    }
+
     @Override
     public void run() {
         //1推送到
@@ -147,22 +160,6 @@ public class ScreenLiveService extends Service implements Runnable {
         }
     }
 
-    public void stopLive() {
-        isLiving = false;
-        if (videoCodec != null) {
-            videoCodec.stopLive();
-        }
-        if (audioCodec != null) {
-            audioCodec.stopLive();
-        }
-    }
-
-    protected class ScreenLiveBinder extends Binder {
-        public ScreenLiveService getService() {
-            return ScreenLiveService.this;
-        }
-    }
-
     //生产者入口
     public void addPackage(RTMPPackage rtmpPackage) {
         if (!isLiving) {
@@ -171,11 +168,14 @@ public class ScreenLiveService extends Service implements Runnable {
         queue.add(rtmpPackage);
     }
 
-    //    开启 推送模式
-    public void startLive(String url, MediaProjection mediaProjection) {
-        this.mediaProjection = mediaProjection;
-        this.url = url;
-        DefaultPoolExecutor.getInstance().execute(this);
+    public void stopLive() {
+        isLiving = false;
+        if (videoCodec != null) {
+            videoCodec.stopLive();
+        }
+        if (audioCodec != null) {
+            audioCodec.stopLive();
+        }
     }
 
     private native boolean sendData(byte[] data, int len, long tms, int type);

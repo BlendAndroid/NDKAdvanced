@@ -28,16 +28,17 @@ public class DecoderPlayerLiveH265 {
     }
 
     public void callBack(byte[] data) {
+        // 获取输入缓冲区的索引
         int index = mediaCodec.dequeueInputBuffer(100000);
         if (index >= 0) {
             ByteBuffer inputBuffer = mediaCodec.getInputBuffer(index);
             inputBuffer.clear();
             inputBuffer.put(data, 0, data.length);
-//dsp芯片解码    解码 的 传进去的   只需要保证编码顺序就好了  1000
-            mediaCodec.queueInputBuffer(index,
-                    0, data.length, System.currentTimeMillis(), 0);
+            //dsp芯片解码, 只需要保证编码顺序就好了
+            mediaCodec.queueInputBuffer(index, 0, data.length, System.currentTimeMillis(), 0);
         }
-//        获取到解码后的数据  编码 ipbn
+
+        // 获取到解码后的数据编码
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
         int outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 100000);
         while (outputBufferIndex >= 0) {

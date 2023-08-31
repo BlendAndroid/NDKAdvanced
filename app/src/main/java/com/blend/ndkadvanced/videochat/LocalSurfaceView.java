@@ -27,22 +27,19 @@ public class LocalSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         startPreview();
     }
 
-    byte[] buffer;
+    private byte[] buffer;
 
     private void startPreview() {
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
-//        流程
         Camera.Parameters parameters = mCamera.getParameters();
-//尺寸
         size = parameters.getPreviewSize();
         try {
+            //绑定SurfaceView进行输出,Camera的数据输出就是SurfaceView
             mCamera.setPreviewDisplay(getHolder());
-//            横着
             mCamera.setDisplayOrientation(90);
             buffer = new byte[size.width * size.height * 3 / 2];
             mCamera.addCallbackBuffer(buffer);
             mCamera.setPreviewCallbackWithBuffer(this);
-//            输出数据怎么办
             mCamera.startPreview();
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,8 +64,7 @@ public class LocalSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
-//        获取到摄像头的原始数据yuv
-//        开始    视频通话
+//        获取到摄像头的原始数据yuv,就是NV21格式的
         if (encoderPushLiveH265 != null) {
             encoderPushLiveH265.encodeFrame(bytes);
         }

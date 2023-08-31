@@ -133,7 +133,7 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
 
     // 开始旋转数据，不旋转的话，就是横屏的，顺时针旋转
-    // 将竖屏的数据，旋转成横屏的数据
+    // 将横屏的数据，旋转成竖屏的数据
     private void portraitData2Raw(byte[] data) {
         int width = size.width;
         int height = size.height;

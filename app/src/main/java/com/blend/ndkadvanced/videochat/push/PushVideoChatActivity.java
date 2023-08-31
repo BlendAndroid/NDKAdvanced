@@ -32,7 +32,9 @@ public class PushVideoChatActivity extends AppCompatActivity implements SocketCa
         mBinding.remotePushSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder holder) {
+                // 获取到surface
                 surface = holder.getSurface();
+                // 解码远端的数据
                 decoderPlayerLiveH265 = new DecoderPlayerLiveH265();
                 decoderPlayerLiveH265.initDecoder(surface, 1080, 2340);
 
@@ -48,7 +50,7 @@ public class PushVideoChatActivity extends AppCompatActivity implements SocketCa
             }
         });
 
-        // 本地摄像头,开始解码
+        // 本地摄像头,编码视频数据
         mBinding.btnPushVideoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +60,7 @@ public class PushVideoChatActivity extends AppCompatActivity implements SocketCa
         });
     }
 
+    // 获取到远端的数据
     @Override
     public void callBack(byte[] data) {
         if (decoderPlayerLiveH265 != null) {

@@ -26,6 +26,7 @@ public class YuvUtils {
         return nv12;
     }
 
+    // 将横屏的数据，旋转成竖屏的数据
     public static void portraitData2Raw(byte[] data, byte[] output, int width, int height) {
         int y_len = width * height;
         int uvHeight = height >> 1; // uv数据高为y数据高的一半
