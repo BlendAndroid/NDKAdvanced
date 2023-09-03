@@ -9,9 +9,10 @@ public class RTMPPackage {
     // 音频信息
     public static final int RTMP_PACKET_TYPE_AUDIO_DATA = 2;
 
-    //    帧数据
+    // 帧数据
     private byte[] buffer;
-    //    时间戳
+
+    // 时间戳，毫秒
     private long tms;
 
     // 数据类型

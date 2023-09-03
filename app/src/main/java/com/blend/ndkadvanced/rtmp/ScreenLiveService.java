@@ -58,8 +58,7 @@ public class ScreenLiveService extends Service implements Runnable {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
-                startForeground(NOTIFICATION_ID, getNotification(),
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
+                startForeground(NOTIFICATION_ID, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 stopForeground(true);
@@ -74,8 +73,7 @@ public class ScreenLiveService extends Service implements Runnable {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID, CHANNEL_ID, importance);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_ID, importance);
             channel.setDescription(CHANNEL_ID);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
@@ -92,11 +90,7 @@ public class ScreenLiveService extends Service implements Runnable {
                 pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             }
 
-            Notification.Builder builder = new Notification.Builder(getApplicationContext())
-                    .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setContentTitle("正在向B站推流")
-                    .setContentIntent(pendingIntent)
-                    .setContentText("点击返回屏幕录制");
+            Notification.Builder builder = new Notification.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle("正在向B站推流").setContentIntent(pendingIntent).setContentText("点击返回屏幕录制");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 builder.setChannelId(CHANNEL_ID);
             }
@@ -126,20 +120,23 @@ public class ScreenLiveService extends Service implements Runnable {
 
     @Override
     public void run() {
-        //1推送到
+        //建立RTMP流
         if (!connect(url)) {
             Log.i(TAG, "run: ----------->推送失败");
             return;
         }
-//        开启线程
-//
+
+        // 视频编码
         videoCodec = new VideoCodec(ScreenLiveService.this);
         videoCodec.startLive(mediaProjection);
 
+        // 音频编码
         audioCodec = new AudioCodec(ScreenLiveService.this);
         audioCodec.startLive();
 
         isLiving = true;
+
+        // 消费者
         while (isLiving) {
             RTMPPackage rtmpPackage = null;
             try {
@@ -147,20 +144,16 @@ public class ScreenLiveService extends Service implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-//
+
             if (rtmpPackage.getBuffer() != null && rtmpPackage.getBuffer().length != 0) {
                 Log.i(TAG, "run: ----------->推送 " + rtmpPackage.getBuffer().length);
 
-                sendData(rtmpPackage.getBuffer(), rtmpPackage.getBuffer()
-                        .length, rtmpPackage.getTms(), rtmpPackage.getType());
+                sendData(rtmpPackage.getBuffer(), rtmpPackage.getBuffer().length, rtmpPackage.getTms(), rtmpPackage.getType());
             }
-
-
-//            消费者
         }
     }
 
-    //生产者入口
+    // 生产者入口
     public void addPackage(RTMPPackage rtmpPackage) {
         if (!isLiving) {
             return;

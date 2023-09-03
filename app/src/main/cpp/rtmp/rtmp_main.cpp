@@ -19,28 +19,26 @@ typedef struct {
 
 Live *live = NULL;
 
-//传递第一帧      00 00 00 01 67 64 00 28ACB402201E3CBCA41408681B4284D4  0000000168  EE 06 F2 C0
+//传递第一帧      00000001 6742C01FDA8220796F9A80808083C2010A80 0000000168CE3C80
 void prepareVideo(int8_t *data, int len, Live *live) {
-
     for (int i = 0; i < len; i++) {
-//        防止越界
+        // 防止越界
         if (i + 4 < len) {
             if (data[i] == 0x00 && data[i + 1] == 0x00
                 && data[i + 2] == 0x00
                 && data[i + 3] == 0x01) {
                 if (data[i + 4] == 0x68) {
                     live->sps_len = i - 4;
-//                    new一个数组
+                    // new一个数组
                     live->sps = static_cast<int8_t *>(malloc(live->sps_len));
-//                    sps解析出来了
+                    // sps解析出来了
                     memcpy(live->sps, data + 4, live->sps_len);
 
-//                    解析pps
+                    // 解析pps
                     live->pps_len = len - (4 + live->sps_len) - 4;
-//                    实例化PPS 的数组
+                    // 实例化PPS 的数组
                     live->pps = static_cast<int8_t *>(malloc(live->pps_len));
-//                    rtmp  协议
-
+                    // 拷贝pps的内容
                     memcpy(live->pps, data + 4 + live->sps_len + 4, live->pps_len);
                     LOGI("sps:%d pps:%d", live->sps_len, live->pps_len);
                     break;
@@ -51,11 +49,12 @@ void prepareVideo(int8_t *data, int len, Live *live) {
     }
 }
 
+// 发送sps和pps
 RTMPPacket *createVideoPackage(Live *live) {
-//sps  pps 的 packaet
+    // 组装sps，pps的packet
     int body_size = 16 + live->sps_len + live->pps_len;
     RTMPPacket *packet = (RTMPPacket *) malloc(sizeof(RTMPPacket));
-//    实例化数据包
+    // 实例化数据包
     RTMPPacket_Alloc(packet, body_size);
     int i = 0;
     packet->m_body[i++] = 0x17;
@@ -67,35 +66,30 @@ RTMPPacket *createVideoPackage(Live *live) {
     packet->m_body[i++] = 0x00;
     //AVC sequence header
     packet->m_body[i++] = 0x01;
-//    原始 操作
-
+    // 原始操作
     packet->m_body[i++] = live->sps[1]; //profile 如baseline、main、 high
-
     packet->m_body[i++] = live->sps[2]; //profile_compatibility 兼容性
     packet->m_body[i++] = live->sps[3]; //profile level
     packet->m_body[i++] = 0xFF;//已经给你规定好了
     packet->m_body[i++] = 0xE1; //reserved（111） + lengthSizeMinusOne（5位 sps 个数） 总是0xe1
-//高八位
+    // 高八位
     packet->m_body[i++] = (live->sps_len >> 8) & 0xFF;
-//    低八位
+    // 低八位
     packet->m_body[i++] = live->sps_len & 0xff;
-//    拷贝sps的内容
+    // 拷贝sps的内容
     memcpy(&packet->m_body[i], live->sps, live->sps_len);
     i += live->sps_len;
-//    pps
+    // pps
     packet->m_body[i++] = 0x01; //pps number
-//rtmp 协议
     //pps length
     packet->m_body[i++] = (live->pps_len >> 8) & 0xff;
     packet->m_body[i++] = live->pps_len & 0xff;
-//    拷贝pps内容
+    // 拷贝pps内容
     memcpy(&packet->m_body[i], live->pps, live->pps_len);
-//packaet
-//视频类型
+    // 视频类型
     packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
-//
     packet->m_nBodySize = body_size;
-//    视频 04
+    // 视频 04
     packet->m_nChannel = 0x04;
     packet->m_nTimeStamp = 0;
     packet->m_hasAbsTimestamp = 0;
@@ -109,33 +103,32 @@ RTMPPacket *createVideoPackage(int8_t *buf, int len, const long tms, Live *live)
 
     // 要减去00 00 00 01的长度
     len -= 4;
-//长度
+    //长度
     RTMPPacket *packet = (RTMPPacket *) malloc(sizeof(RTMPPacket));
     int body_size = len + 9;
-//初始化RTMP内部的body数组
+    //初始化RTMP内部的body数组
     RTMPPacket_Alloc(packet, body_size);
 
-
     if (buf[0] == 0x65) {
-        packet->m_body[0] = 0x17;
+        packet->m_body[0] = 0x17;   // 表示关键帧
         LOGI("发送关键帧 data");
     } else {
-        packet->m_body[0] = 0x27;
+        packet->m_body[0] = 0x27;   // 表示非关键帧
         LOGI("发送非关键帧 data");
     }
-//    固定的大小
+    // 固定的大小
     packet->m_body[1] = 0x01;
     packet->m_body[2] = 0x00;
     packet->m_body[3] = 0x00;
     packet->m_body[4] = 0x00;
 
-    //长度
+    // 长度
     packet->m_body[5] = (len >> 24) & 0xff;
     packet->m_body[6] = (len >> 16) & 0xff;
     packet->m_body[7] = (len >> 8) & 0xff;
     packet->m_body[8] = (len) & 0xff;
 
-    //数据
+    // 数据
     memcpy(&packet->m_body[9], buf, len);
 
     packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
@@ -155,26 +148,27 @@ int sendPacket(RTMPPacket *packet) {
     return r;
 }
 
-//传递第一帧      00 00 00 01 67 64 00 28ACB402201E3CBCA41408081B4284D4  0000000168 EE 06 F2 C0
 int sendVideo(int8_t *buf, int len, long tms) {
     int ret = 0;
+
+    // 判断第一帧      00000001 6742C01FDA8220796F9A80808083C2010A80 0000000168CE3C80
     if (buf[4] == 0x67) {
-//        缓存sps 和pps 到全局遍历 不需要推流
+        // 缓存sps 和pps 到全局 不需要推流
         if (live && (!live->pps || !live->sps)) {
-//缓存 没有推流
+            //缓存，没有推流
             prepareVideo(buf, len, live);
         }
         return ret;
     }
-//    I帧
-    if (buf[4] == 0x65) {//关键帧
-//         推两个
-//sps 和 ppps 的paclet  发送sps pps
+
+    // 判断I帧，00000001 65B84开头的
+    if (buf[4] == 0x65) { //关键帧
+        // sps 和 pps 的packet  发送sps pps
         RTMPPacket *packet = createVideoPackage(live);
         sendPacket(packet);
-//        发送I帧
     }
-//    两个   I帧  0x17  B P 0x27
+
+    // 发送I帧
     RTMPPacket *packet2 = createVideoPackage(buf, len, tms, live);
     ret = sendPacket(packet2);
     return ret;
@@ -183,16 +177,15 @@ int sendVideo(int8_t *buf, int len, long tms) {
 RTMPPacket *createAudioPacket(int8_t *buf, const int len, const int type, const long tms,
                               Live *live) {
 
-//    组装音频包  两个字节    是固定的   af    如果是第一次发  你就是 01       如果后面   00  或者是 01  aac
+    // 组装音频包，音频包的格式是固定的，在音频数据前拼两个字节，才符合flv/rtmp 的格式
     int body_size = len + 2;
     RTMPPacket *packet = (RTMPPacket *) malloc(sizeof(RTMPPacket));
     RTMPPacket_Alloc(packet, body_size);
-//         音频头
+    // 10101111  根据flv的数据结构拼接 10：AAC，3：44100采样率，1：采样长度，1：声道。按照位数表示数据就为：OxAF
     packet->m_body[0] = 0xAF;
-    if (type == 1) {
-//        头
+    if (type == 1) {    // 如果是音频头
         packet->m_body[1] = 0x00;
-    } else {
+    } else {    // 如果是音频数据
         packet->m_body[1] = 0x01;
     }
     memcpy(&packet->m_body[2], buf, len);
@@ -207,7 +200,7 @@ RTMPPacket *createAudioPacket(int8_t *buf, const int len, const int type, const 
 }
 
 int sendAudio(int8_t *buf, int len, int type, int tms) {
-//    创建音频包   如何组装音频包
+    // 创建音频包
     RTMPPacket *packet = createAudioPacket(buf, len, type, tms, live);
     int ret = sendPacket(packet);
     return ret;
@@ -219,17 +212,18 @@ Java_com_blend_ndkadvanced_rtmp_ScreenLiveService_sendData(JNIEnv *env, jobject 
                                                            jbyteArray data_,
                                                            jint len, jlong tms, jint type) {
     int ret;
+    // 将java的byte数组转换成c的byte数组
     jbyte *data = env->GetByteArrayElements(data_, NULL);
     switch (type) {
         case 0: //video
             ret = sendVideo(data, len, tms);
-
             break;
         default: //audio
             ret = sendAudio(data, len, type, tms);
             LOGI("send Audio  lenght :%d", len);
             break;
     }
+    // 释放内存 0:JNI_ABORT 释放data数组,不会同步到java数组中
     env->ReleaseByteArrayElements(data_, data, 0);
     return ret;
 }
@@ -238,30 +232,43 @@ extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_blend_ndkadvanced_rtmp_ScreenLiveService_connect(JNIEnv *env, jobject thiz, jstring url_) {
     const char *url = env->GetStringUTFChars(url_, 0);
-//    链接   服务器   重试几次
+
+    // RTMP链接失败标志位
     int ret;
     do {
-//        实例化
+        // 实例化结构体,这个结构体包含RTMP,sps和pps
         live = (Live *) malloc(sizeof(Live));
+
+        // void *memset(void *str, int c, size_t n) 复制字符 c（一个无符号字符）到参数 str 所指向的字符串的前 n 个字符。
+        // 要被设置的值。该值以 int 形式传递，但是函数在填充内存块时是使用该值的无符号字符形式。
         memset(live, 0, sizeof(Live));
 
+        // 实例化RTMP,设置超时时间
         live->rtmp = RTMP_Alloc();
         RTMP_Init(live->rtmp);
         live->rtmp->Link.timeout = 10;
         LOGI("connect %s", url);
+
+        // 设置RTMP流媒体服务器的URL,需要在RTMP_Connect之前调用
         if (!(ret = RTMP_SetupURL(live->rtmp, (char *) url))) break;
         RTMP_EnableWrite(live->rtmp);
-        LOGI("RTMP_Connect");
+        LOGI("RTMP_Connect %d", ret);
+
+        // 进行连接操作
         if (!(ret = RTMP_Connect(live->rtmp, 0))) break;
-        LOGI("RTMP_ConnectStream ");
+        LOGI("RTMP_ConnectStream %d", ret);
+
+        // 连接到RTMP流，并开始发送和接收数据
         if (!(ret = RTMP_ConnectStream(live->rtmp, 0))) break;
-        LOGI("connect success");
+        LOGI("connect success %d", ret);
     } while (0);
-// sps  pps javabean
+
+    // 如果成功，这里返回的都是1
     if (!ret && live) {
         free(live);
         live = nullptr;
     }
     env->ReleaseStringUTFChars(url_, url);
+    LOGI("connect result %d", ret);
     return ret;
 }
