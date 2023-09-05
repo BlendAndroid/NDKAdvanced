@@ -24,11 +24,15 @@ public class X264AndFaacActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityX264Binding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+
         livePusher = new LivePusher();
 
+        // 初始化视频
         mCameraXHelper = new CameraXHelper(this, mBinding.x264TextureView, livePusher);
+        // 初始化音频
         audioChannel = new AudioChannel(44100, 2, livePusher);
-//        链接B站
+
+        // 链接B站
         livePusher.startLive(url);
 
         mBinding.btnToggleCamera.setOnClickListener(new View.OnClickListener() {

@@ -4,6 +4,8 @@ import android.util.Log;
 
 public class LivePusher {
 
+    private static final String TAG = "LivePusher";
+
     public LivePusher() {
         native_init();
     }
@@ -12,12 +14,9 @@ public class LivePusher {
         native_start(path);
     }
 
-    //    jni回调java层的方法  byte[] data    char *data
+    // jni回调java层的方法  byte[] data    char *data
     private void postData(byte[] data) {
-
-        Log.i("rtmp", "postData: " + data.length);
-        // FileUtils.writeBytes(data);
-        // FileUtils.writeContent(data);
+        Log.i(TAG, "postData: " + data.length);
     }
 
     public native void native_init();

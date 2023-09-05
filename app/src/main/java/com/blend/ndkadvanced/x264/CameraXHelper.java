@@ -4,6 +4,7 @@ import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.view.TextureView;
 import android.view.ViewGroup;
@@ -22,11 +23,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, ImageAnalysis.Analyzer {
     private static final String TAG = "CameraXHelper";
-
+    // 直播中一般是480 640
     int width = 480;
     int height = 640;
     private HandlerThread handlerThread;
-    //    直播中  480 640
     private CameraX.LensFacing currentFacing = CameraX.LensFacing.BACK;
     private TextureView textureView;
     private LivePusher livePusher;
@@ -35,14 +35,12 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
         this.textureView = textureView;
         this.livePusher = livePusher;
         //子线程中回调
-
         handlerThread = new HandlerThread("Analyze-thread");
         handlerThread.start();
         CameraX.bindToLifecycle(lifecycleOwner, getPreView(), getAnalysis());
     }
 
     private Preview getPreView() {
-//        480 *640  是 1 不是  2 Cmaera
         PreviewConfig previewConfig = new PreviewConfig.Builder().setTargetResolution(new Size(width, height)).setLensFacing(currentFacing).build();
         Preview preview = new Preview(previewConfig);
         preview.setOnPreviewOutputUpdateListener(this);
@@ -62,10 +60,9 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
         return imageAnalysis;
     }
 
-    //摄像
+    // Preview.OnPreviewOutputUpdateListener的回调方法,用于接收相机预览数据
     @Override
     public void onUpdated(Preview.PreviewOutput output) {
-
         SurfaceTexture surfaceTexture = output.getSurfaceTexture();
         if (textureView.getSurfaceTexture() != surfaceTexture) {
             if (textureView.isAvailable()) {
@@ -103,14 +100,15 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
         if (!isLiving) {
             return;
         }
-//        Log.i("rtmp", "analyze: " + image.getWidth() + "  height " + image.getHeight());
+
+        // Log.i(TAG, "analyze: " + image.getWidth() + "  height " + image.getHeight());
+
         lock.lock();
-//          能够 播放  H264码流   x264     摸索   x264
-//3 ge
+
         ImageProxy.PlaneProxy[] planes = image.getPlanes();
         // 重复使用同一批byte数组，减少gc频率
         if (y == null) {
-//            初始化y v  u
+            // 初始化y v  u
             y = new byte[planes[0].getBuffer().limit() - planes[0].getBuffer().position()];
             u = new byte[planes[1].getBuffer().limit() - planes[1].getBuffer().position()];
             v = new byte[planes[2].getBuffer().limit() - planes[2].getBuffer().position()];
@@ -121,17 +119,13 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
             planes[0].getBuffer().get(y);
             planes[1].getBuffer().get(u);
             planes[2].getBuffer().get(v);
-            int stride = planes[0].getRowStride();
-            Size size = new Size(image.getWidth(), image.getHeight());
-            int width = size.getHeight();
-            int heigth = image.getWidth();
-//            Log.i(TAG, "analyze: "+width+"  heigth "+heigth);
+
             if (nv21 == null) {
-                nv21 = new byte[heigth * width * 3 / 2];
-                nv21_rotated = new byte[heigth * width * 3 / 2];
+                nv21 = new byte[image.getWidth() * image.getHeight() * 3 / 2];
+                nv21_rotated = new byte[image.getWidth() * image.getHeight() * 3 / 2];
             }
-            ImageUtil.yuvToNv21(y, u, v, nv21, heigth, width);
-            ImageUtil.nv21_rotate_to_90(nv21, nv21_rotated, heigth, width);
+            ImageUtil.yuvToNv21(y, u, v, nv21, image.getWidth(), image.getHeight());
+            ImageUtil.nv21_rotate_to_90(nv21, nv21_rotated, image.getWidth(), image.getHeight());
             this.livePusher.native_pushVideo(nv21_rotated);
         }
 

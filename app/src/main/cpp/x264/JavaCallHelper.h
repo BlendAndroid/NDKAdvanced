@@ -14,11 +14,14 @@ public:
     JavaCallHelper(JavaVM *_javaVM, JNIEnv *_env, jobject &_jobj);
 
     void postH264(char *data,int length, int thread = THREAD_MAIN);
+
     ~JavaCallHelper();
 public:
     JavaVM *javaVM;
     JNIEnv *env;
+    // LivePush对象
     jobject jobj;
+    // Java中的方法
     jmethodID jmid_postData;
 };
 
