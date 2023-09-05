@@ -27,7 +27,9 @@ void prepareVideo(int8_t *data, int len, Live *live) {
             if (data[i] == 0x00 && data[i + 1] == 0x00
                 && data[i + 2] == 0x00
                 && data[i + 3] == 0x01) {
+                // 找到sps末尾的位置,也就是pps的头部
                 if (data[i + 4] == 0x68) {
+                    // sps的长度减去开头的4个字节
                     live->sps_len = i - 4;
                     // new一个数组
                     live->sps = static_cast<int8_t *>(malloc(live->sps_len));
@@ -57,26 +59,31 @@ RTMPPacket *createVideoPackage(Live *live) {
     // 实例化数据包
     RTMPPacket_Alloc(packet, body_size);
     int i = 0;
+    // AVC sequence header 与IDR一样,都是0x17,非IDR是0x27
     packet->m_body[i++] = 0x17;
     //AVC sequence header 设置为0x00
     packet->m_body[i++] = 0x00;
-    //CompositionTime
+    //CompositionTime PTS相对于DTS的偏移值
     packet->m_body[i++] = 0x00;
     packet->m_body[i++] = 0x00;
     packet->m_body[i++] = 0x00;
+
+    // AVCDecodeConfigurationRecord,用于描述H.264/AVC（Advanced Video Coding）视频流的参数配置信息。
+    // 该结构体通常作为视频流的前置数据（也称为SPS和PPS数据）一起发送给解码器，以帮助解码器正确地解码视频流
+
     //AVC sequence header
-    packet->m_body[i++] = 0x01;
+    packet->m_body[i++] = 0x01; //configurationVersion 版本号1
     // 原始操作
     packet->m_body[i++] = live->sps[1]; //profile 如baseline、main、 high
     packet->m_body[i++] = live->sps[2]; //profile_compatibility 兼容性
     packet->m_body[i++] = live->sps[3]; //profile level
-    packet->m_body[i++] = 0xFF;//已经给你规定好了
+    packet->m_body[i++] = 0xFF;//profile 如baseline、main、 high
     packet->m_body[i++] = 0xE1; //reserved（111） + lengthSizeMinusOne（5位 sps 个数） 总是0xe1
-    // 高八位
+    // 保存长度值的高八位
     packet->m_body[i++] = (live->sps_len >> 8) & 0xFF;
-    // 低八位
+    // 保存长度值的低八位
     packet->m_body[i++] = live->sps_len & 0xff;
-    // 拷贝sps的内容
+    // 拷贝sps的内容,两个字节
     memcpy(&packet->m_body[i], live->sps, live->sps_len);
     i += live->sps_len;
     // pps
@@ -99,6 +106,7 @@ RTMPPacket *createVideoPackage(Live *live) {
 }
 
 RTMPPacket *createVideoPackage(int8_t *buf, int len, const long tms, Live *live) {
+    // 从第四个字节开始读取
     buf += 4;
 
     // 要减去00 00 00 01的长度
@@ -148,6 +156,7 @@ int sendPacket(RTMPPacket *packet) {
     return r;
 }
 
+// 对于每个NAL块的标识头都去掉，因为这部分信息对rtmp流服务器没用,只需要保留NALU的具体数据,都要减去4个字节
 int sendVideo(int8_t *buf, int len, long tms) {
     int ret = 0;
 
@@ -155,20 +164,20 @@ int sendVideo(int8_t *buf, int len, long tms) {
     if (buf[4] == 0x67) {
         // 缓存sps 和pps 到全局 不需要推流
         if (live && (!live->pps || !live->sps)) {
-            //缓存，没有推流
+            //缓存，不发送
             prepareVideo(buf, len, live);
         }
         return ret;
     }
 
-    // 判断I帧，00000001 65B84开头的
+    // 判断I帧，00000001 65B84开头的,先发送SPS和PPS
     if (buf[4] == 0x65) { //关键帧
         // sps 和 pps 的packet  发送sps pps
         RTMPPacket *packet = createVideoPackage(live);
         sendPacket(packet);
     }
 
-    // 发送I帧
+    // 发送视频数据
     RTMPPacket *packet2 = createVideoPackage(buf, len, tms, live);
     ret = sendPacket(packet2);
     return ret;
@@ -181,7 +190,7 @@ RTMPPacket *createAudioPacket(int8_t *buf, const int len, const int type, const 
     int body_size = len + 2;
     RTMPPacket *packet = (RTMPPacket *) malloc(sizeof(RTMPPacket));
     RTMPPacket_Alloc(packet, body_size);
-    // 10101111  根据flv的数据结构拼接 10：AAC，3：44100采样率，1：采样长度，1：声道。按照位数表示数据就为：OxAF
+    // 10101111  根据flv的数据结构拼接 10：AAC，3：44100采样率，1：采样长度，1：声道。按照位数表示数据就为：0xAF
     packet->m_body[0] = 0xAF;
     if (type == 1) {    // 如果是音频头
         packet->m_body[1] = 0x00;

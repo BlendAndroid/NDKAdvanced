@@ -79,6 +79,7 @@ public class AudioCodec implements Runnable {
         RTMPPackage rtmpPackage = new RTMPPackage();
         byte[] audioDecoderSpecificInfo = {0x12, 0x08};
         rtmpPackage.setBuffer(audioDecoderSpecificInfo);
+        // 音频头
         rtmpPackage.setType(RTMPPackage.RTMP_PACKET_TYPE_AUDIO_HEAD);
         screenLive.addPackage(rtmpPackage);
 
