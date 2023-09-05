@@ -41,10 +41,11 @@ import static com.blend.ndkadvanced.utils.FileUtils.writeContent;
 
 public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, ImageAnalysis.Analyzer {
     private static final String TAG = "CameraXHelper";
+
+    // 直播中, 一般采用480和640
     int width = 480;
     int height = 640;
     private final HandlerThread handlerThread;
-    //    直播中  480 640
     private final CameraX.LensFacing currentFacing = CameraX.LensFacing.BACK;
     private final TextureView textureView;
 
@@ -61,13 +62,17 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
         CameraX.bindToLifecycle(lifecycleOwner, getPreView(), getAnalysis());
     }
 
+    // 预览用例Preview为应用提供了从相机接收图像并显示给用户的用例。
     private Preview getPreView() {
-        PreviewConfig previewConfig = new PreviewConfig.Builder().setTargetResolution(new Size(width, height)).setLensFacing(currentFacing).build();
+        PreviewConfig previewConfig = new PreviewConfig.Builder()
+                .setTargetResolution(new Size(width, height))
+                .setLensFacing(currentFacing).build();
         Preview preview = new Preview(previewConfig);
         preview.setOnPreviewOutputUpdateListener(this);
         return preview;
     }
 
+    // 图像分析用例ImageAnalysis为应用提供可实时分析的图像数据，我们可以对这些图像执行图像处理、计算机视觉或机器学习推断。
     private ImageAnalysis getAnalysis() {
         ImageAnalysisConfig imageAnalysisConfig = new ImageAnalysisConfig.Builder()
                 .setCallbackHandler(new Handler(handlerThread.getLooper()))
@@ -81,10 +86,9 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
         return imageAnalysis;
     }
 
-    //摄像
+    // Preview.OnPreviewOutputUpdateListener的回调方法,用于接收相机预览数据
     @Override
     public void onUpdated(Preview.PreviewOutput output) {
-
         SurfaceTexture surfaceTexture = output.getSurfaceTexture();
         if (textureView.getSurfaceTexture() != surfaceTexture) {
             if (textureView.isAvailable()) {
@@ -96,7 +100,6 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
             }
             textureView.setSurfaceTexture(surfaceTexture);
         }
-
     }
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -112,22 +115,23 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
     public void analyze(ImageProxy image, int rotationDegrees) {
         Log.i(TAG, "analyze: " + image.getWidth() + "  height " + image.getHeight());
         lock.lock();
-//          能够 播放  H264码流   x264     摸索   x264
-//3 ge
+
+        // 三个plane，分别对应YUV三个分量
         ImageProxy.PlaneProxy[] planes = image.getPlanes();
         // 重复使用同一批byte数组，减少gc频率
         if (y == null) {
-//            初始化y v  u
+            // 初始化y v  u
             y = new byte[planes[0].getBuffer().limit() - planes[0].getBuffer().position()];
             u = new byte[planes[1].getBuffer().limit() - planes[1].getBuffer().position()];
             v = new byte[planes[2].getBuffer().limit() - planes[2].getBuffer().position()];
         }
 
+        // 读取数据到byte数组中
         if (image.getPlanes()[0].getBuffer().remaining() == y.length) {
             planes[0].getBuffer().get(y);
             planes[1].getBuffer().get(u);
             planes[2].getBuffer().get(v);
-            int stride = planes[0].getRowStride();
+
             Size size = new Size(image.getWidth(), image.getHeight());
             int width = size.getHeight();
             int height = image.getWidth();
@@ -142,11 +146,15 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
             }
             ImageUtil.yuvToNv21(y, u, v, nv21, height, width);
             ImageUtil.nv21_rotate_to_90(nv21, nv21_rotated, height, width);
+
+            // 保存图片
             if (isCapture) {
                 isCapture = false;
                 //TODO 这里是NV21的数据格式
                 capture(nv21_rotated, width, height);
             }
+
+            // 将NV21旋转90度后，转成NV12
             byte[] temp = ImageUtil.nv21toNV12(nv21_rotated, nv12);
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int inIndex = mediaCodec.dequeueInputBuffer(100000);
@@ -170,7 +178,6 @@ public class CameraXHelper implements Preview.OnPreviewOutputUpdateListener, Ima
         }
 
         lock.unlock();
-
     }
 
     private void initCodec(Size size) {
