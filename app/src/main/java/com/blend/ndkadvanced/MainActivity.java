@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
+    // NDK BUG 调试
+    // aarch64-linux-android-addr2line.exe -f -e C:\Project\NDKAdvanced\app\build\intermediates\cmake\debug\obj\armeabi-v7a\libnative-lib.so xxxx
+
     private ActivityMainBinding binding;
 
     @Override

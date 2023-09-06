@@ -15,7 +15,7 @@ public class AudioChannel {
     private final byte[] buffer;
     private final Handler handler;
     private HandlerThread handlerThread;
-    private final AudioRecord audioRecord;
+    private AudioRecord audioRecord;
 
     @SuppressLint("MissingPermission")
     public AudioChannel(int sampleRate, int channels, LivePusher livePusher) {
@@ -65,6 +65,15 @@ public class AudioChannel {
     }
 
     public void stop() {
-        audioRecord.startRecording();
+        if (audioRecord != null) {
+            audioRecord.stop();
+        }
+    }
+
+    public void release() {
+        if (audioRecord != null) {
+            audioRecord.release();
+            audioRecord = null;
+        }
     }
 }

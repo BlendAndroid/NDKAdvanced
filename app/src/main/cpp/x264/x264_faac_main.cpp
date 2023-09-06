@@ -29,9 +29,12 @@ RTMP *rtmp = 0;
 // 虚拟机的引用
 JavaVM *javaVM = 0;
 
+void RTMP_close_free();
+
 // typedef void (*Callback)(RTMPPacket *); 函数指针类型的实现
 void callBack(RTMPPacket *packet) {
     if (packet) {
+        // 如果packets的大小大于50,就清空
         if (packets.size() > 50) {
             packets.clear();
         }
@@ -80,6 +83,7 @@ void *start(void *args) {
         ret = RTMP_Connect(rtmp, 0);
         if (!ret) {
             LOGE("rtmp连接地址失败:%s", url);
+            RTMP_close_free();
             break;
         }
         // 连接 RTMP 流
@@ -88,6 +92,7 @@ void *start(void *args) {
         LOGE("rtmp连接成功----------->:%s", url);
         if (!ret) {
             LOGE("rtmp连接流失败:%s", url);
+            RTMP_close_free();
             break;
         }
 
@@ -126,11 +131,17 @@ void *start(void *args) {
         releasePackets(packet);
     } while (0);
     if (rtmp) {
-        RTMP_Close(rtmp);
-        RTMP_Free(rtmp);
+        RTMP_close_free();
     }
     delete url;
     return 0;
+}
+
+void RTMP_close_free() {
+    RTMP_Close(rtmp);
+    RTMP_Free(rtmp);
+    rtmp = NULL;
+    isStart = 0;
 }
 
 extern "C"
@@ -208,9 +219,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_blend_ndkadvanced_x264_LivePusher_native_1release(JNIEnv *env, jobject thiz) {
     if (rtmp) {
-        RTMP_Close(rtmp);
-        RTMP_Free(rtmp);
-        rtmp = nullptr;
+        RTMP_close_free();
     }
     if (videoChannel) {
         delete (videoChannel);

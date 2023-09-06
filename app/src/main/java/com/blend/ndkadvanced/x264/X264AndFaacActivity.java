@@ -61,7 +61,8 @@ public class X264AndFaacActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        audioChannel.release();
         livePusher.native_release();
+        super.onDestroy();
     }
 }
