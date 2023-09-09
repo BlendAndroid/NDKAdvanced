@@ -31,6 +31,9 @@ add_library(
         gif/gif_main.cpp
         rtmp/rtmp_main.cpp
         ${x264_source}
+        mmkv/MMKV_main.cpp
+        mmkv/MMKV.cpp
+        mmkv/ProtoBuf.cpp
 )
 
 # find_library(name1 path1 path2 ...) 将一个变量和Android NDK的某个库建立关联关系。

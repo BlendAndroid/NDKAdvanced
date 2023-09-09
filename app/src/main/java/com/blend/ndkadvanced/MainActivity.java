@@ -17,6 +17,7 @@ import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
 import com.blend.ndkadvanced.h264.H264Activity;
 import com.blend.ndkadvanced.hello.HelloWorldActivity;
+import com.blend.ndkadvanced.mmkv.MMKVActivity;
 import com.blend.ndkadvanced.opengl.OpenGLActivity;
 import com.blend.ndkadvanced.rtmp.RTMPActivity;
 import com.blend.ndkadvanced.screenshare.player.PlayerScreenShareActivity;
@@ -98,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, CameraFilterActivity.class));
                 }
         );
+
+        binding.btnMMKV.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, MMKVActivity.class));
+        });
     }
 
     public void verifyStoragePermissions() {

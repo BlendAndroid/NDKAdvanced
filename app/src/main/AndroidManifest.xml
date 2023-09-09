@@ -23,9 +23,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".mmkv.MMKVActivity"
+            android:exported="false"
+            android:label="MMKV" />
+        <activity
             android:name=".opengl.vary.VaryOpenGLActivity"
-            android:label="图形变换"
-            android:exported="false" />
+            android:exported="false"
+            android:label="图形变换" />
         <activity
             android:name=".opengl.base.BaseOpenGlLActivity"
             android:exported="false"

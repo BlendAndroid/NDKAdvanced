@@ -122,5 +122,12 @@
             android:text="滤镜"
             android:textAllCaps="false" />
 
+        <Button
+            android:id="@+id/btnMMKV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="MMKV"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 </ScrollView>
