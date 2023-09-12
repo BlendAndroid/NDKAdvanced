@@ -6,10 +6,10 @@ uniform vec3 vChangeColor;
 uniform int vIsHalf;
 uniform float uXY;
 
-varying vec4 gPosition;
+varying vec4 gPosition; //最终显示的位置
 
-varying vec2 aCoordinate;
-varying vec4 aPos;
+varying vec2 aCoordinate;   // 纹理坐标系
+varying vec4 aPos;  // 世界坐标系
 
 void modifyColor(vec4 color){
     color.r=max(min(color.r, 1.0), 0.0);
@@ -19,7 +19,11 @@ void modifyColor(vec4 color){
 }
 
 void main(){
+    // 开始渲染纹理坐标系
     vec4 nColor=texture2D(vTexture, aCoordinate);
+    // aPos.x>0.0表示世界坐标系中心点的右边，也就是右半边
+    // vIsHalf表示是否处理一半，如果vIsHalf为0，则vIsHalf==0始终为true，就全部处理
+    // 如果vIsHalf==1，那只有aPos.x>0.0的点才处理，也就是右半边处理
     if (aPos.x>0.0||vIsHalf==0){
         if (vChangeType==1){
             float c=nColor.r*vChangeColor.r+nColor.g*vChangeColor.g+nColor.b*vChangeColor.b;

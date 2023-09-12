@@ -44,6 +44,7 @@ public class PictureFilterActivity extends AppCompatActivity {
         mBinding.btnOpenGLChangeHalf.setOnClickListener(v -> {
             isHalf = !isHalf;
             mRender.setHalf(isHalf);
+            // 重新渲染
             mBinding.pictureGlSurfaceView.requestRender();
             if (isHalf) {
                 mBinding.btnOpenGLChangeHalf.setText("处理一半");

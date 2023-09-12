@@ -36,7 +36,7 @@ import javax.microedition.khronos.opengles.GL10;
  * attribute变量
  * attribute变量是只能在vertex shader中使用的变量。（它不能在fragment shader中声明attribute变量，也不能被fragment shader中使用）
  * 一般用attribute变量来表示一些顶点的数据，如：顶点坐标，法线，纹理坐标，顶点颜色等。
- * 在application中，一般用函数glBindAttribLocation（）来绑定每个attribute变量的位置，然后用函数glVertexAttribPointer（）为每
+ * 在application中，一般用函数glGetAttribLocation（）来绑定每个attribute变量的位置，然后用函数glVertexAttribPointer（）为每
  * 个attribute变量赋值。
  * <p>
  * <p>

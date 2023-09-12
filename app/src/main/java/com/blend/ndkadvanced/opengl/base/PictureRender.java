@@ -19,10 +19,10 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * 启用纹理映射后，如果想把一幅纹理映射到相应的几何图元，就必须告诉GPU如何进行纹理映射，也就是为图元的顶点指定恰当的纹理坐标。
  * 2D纹理坐标在x和y轴上，范围为0到1之间。使用纹理坐标获取纹理颜色叫做采样(Sampling)。纹理坐标起始于(0, 0)，也就是纹理图片
- * 的左下角，终始于(1, 1)，即纹理图片的右上角。
+ * 的左上角，终始于(1, 1)，即纹理图片的右下角。
  * <p>
- * `sampler2D` 是 GLSL 中的一种变量类型，用于表示 2D 纹理对象。它可以在片段着色器中使用，将纹理图像映射到几何形状的表面上，
- * 实现纹理贴图的效果。
+ * `sampler2D` 是 GLSL 中的一种变量类型，用于表示 2D 纹理对象。它可以在片元着色器中（Fragment Shader）使用，将纹理图像
+ * 映射到几何形状的表面上，实现纹理贴图的效果。
  * `sampler2D` 通常与纹理坐标一起使用，纹理坐标指定图像中的一个特定点，而 `sampler2D` 则表示该点的颜色值。在片段着色器中，
  * 可以使用 `texture2D` 函数来获取 `sampler2D` 中的颜色值。
  * <p>
@@ -30,7 +30,7 @@ import javax.microedition.khronos.opengles.GL10;
  * `n` 参数指定要生成的纹理对象数量，
  * `textures` 参数是一个整型数组，用于存储生成的纹理对象的名称，
  * `offset` 参数表示从数组的哪个位置开始存储。
- * 将纹理坐标映射到顶点坐标
+ * 将世界坐标映射到纹理坐标
  */
 public class PictureRender implements GLSurfaceView.Renderer {
 
@@ -54,6 +54,7 @@ public class PictureRender implements GLSurfaceView.Renderer {
     // 通过 varying 关键字，将 v_texCoord 变量从顶点着色器传递到片元着色器
     // sampler2D，是GLSL的变量类型之一的取样器。texture2D也有提到，它是GLSL的内置函数，
     // 用于2D纹理取样，根据纹理取样器和纹理坐标，可以得到当前纹理取样得到的像素颜色。
+    // 接受两个参数：纹理采样器和纹理坐标,返回对应位置的像素颜色值
     private final String fragmentShaderCode =
             "precision mediump float;" +
                     "varying vec2 v_texCoord;" +
@@ -80,12 +81,12 @@ public class PictureRender implements GLSurfaceView.Renderer {
             1, -1, 0,  // bottom right
     };
 
-    // 设置纹理坐标，纹理坐标的范围是 0~1，左下角是 (0, 0)，右上角是 (1, 1)。
+    // 设置纹理坐标，纹理坐标的范围是 0~1，左上角是 (0, 0)，右下角是 (1, 1)。
     private static final float[] TEX_VERTEX = {
-            1, 0,  // bottom right
-            0, 0,  // bottom left
-            0, 1,  // top left
-            1, 1,  // top right
+            1, 0,  // top right
+            0, 0,  // top left
+            0, 1,  // bottom left
+            1, 1,  // bottom right
     };
 
     // 0 -> 1 -> 2 绘制的是 右上 -> 左上 -> 左下 上半个三角形，逆时针方向，
@@ -149,7 +150,7 @@ public class PictureRender implements GLSurfaceView.Renderer {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
         GLES20.glEnableVertexAttribArray(mTexCoordHandle);
 
-        // 传入顶点坐标
+        // 传入世界坐标
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,
                 12, mVertexBuffer);
 
@@ -179,6 +180,13 @@ public class PictureRender implements GLSurfaceView.Renderer {
         // 通过 glActiveTexture 激活指定编号的纹理,一共有32个
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         // 通过 glBindTexture 将新建的纹理和编号绑定起来, 绑定纹理句柄，将对象绑定到环境的纹理单元
+        // 纹理单元是图形渲染管线中的一个重要概念，用于存储和管理纹理数据。在OpenGL中，通常有多个纹理单元可供使用，每个纹理单元可以
+        // 绑定不同的纹理对象。纹理单元的数量取决于GPU的硬件限制，通常至少有8个纹理单元可供使用。
+        // 绑定纹理单元,将纹理对象绑定到纹理单元上，这里的纹理单元是 GL_TEXTURE0，它是一个纹理单元的编号，它的值是 0
+        // 在OpenGL中，纹理单元使用枚举常量表示，从GL_TEXTURE0开始递增。GL_TEXTURE0表示第一个纹理单元，GL_TEXTURE1表示
+        // 第二个纹理单元，以此类推。GL_TEXTURE0通常被用作默认的纹理单元，如果不显式指定纹理单元，默认情况下OpenGL会将纹理绑定
+        // 到GL_TEXTURE0单元。因此，GL_TEXTURE0被广泛使用，并且在绑定纹理时经常被指定。使用GL_TEXTURE0作为纹理单元的好处是，
+        // 在大多数情况下，不需要手动指定纹理单元。在着色器中，使用sampler2D uniform变量时，默认会从GL_TEXTURE0单元中获取纹理数据。
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexName);
 
         // 设置纹理对象的参数
@@ -245,7 +253,12 @@ public class PictureRender implements GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMVPMatrix, 0);
 
         // 设置纹理值
-        GLES20.glUniform1i(mTexSamplerHandle, 0);
+        // texture2D函数用于在片段着色器中对纹理进行采样。其中，第一个参数是纹理采样器的索引，用于指定当前纹理采样器的
+        // 纹理单元。这个索引值对应的是纹理单元的编号，而不是纹理对象的编号。
+        // 通常情况下，我们使用的是GL_TEXTURE0纹理单元作为默认的纹理单元。因此，当在片段着色器中调用texture2D函数时，
+        // 将纹理采样器的索引参数设置为0，表示从当前绑定到GL_TEXTURE0纹理单元的纹理数据中进行采样。
+        // 因为之前绑定的纹理单元是0,所以这里设置的纹理单元就是0
+        GLES20.glUniform1i(mTexSamplerHandle, GLES20.GL_TEXTURE0);
 
         // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,

@@ -28,8 +28,6 @@ public class CameraHelper {
                 .setTargetResolution(new Size(640, 480))
                 .setLensFacing(currentFacing) //前置或者后置摄像头
                 .build();
-//        要不  得到他的数据
-
         Preview preview = new Preview(previewConfig);
         preview.setOnPreviewOutputUpdateListener(listener);
         return preview;

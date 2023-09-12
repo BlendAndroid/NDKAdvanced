@@ -35,7 +35,7 @@ public class PictureFilterRender implements GLSurfaceView.Renderer {
     private int mMatrixHandle;
 
     // VERTEX 保存了 4 个顶点的坐标，VERTEX_INDEX 保存了顶点的绘制顺序。
-    // 设置顶点坐标
+    // 设置顶点坐标,也就是世界坐标系
     private static final float[] VERTEX = {   // in counterclockwise order:
             1, 1, 0,   // top right
             -1, 1, 0,  // top left
@@ -43,14 +43,15 @@ public class PictureFilterRender implements GLSurfaceView.Renderer {
             1, -1, 0,  // bottom right
     };
 
-    // 设置纹理坐标，纹理坐标的范围是 0~1，左下角是 (0, 0)，右上角是 (1, 1)。
+    // 设置纹理坐标，纹理坐标的范围是 0~1，左上角是 (0, 0)，右下角是 (1, 1)。
     private static final float[] TEX_VERTEX = {
-            1, 0,  // bottom right
-            0, 0,  // bottom left
-            0, 1,  // top left
-            1, 1,  // top right
+            1, 0,  // top right
+            0, 0,  // top left
+            0, 1,  // bottom left
+            1, 1,  // bottom right
     };
 
+    // 纹理坐标系绘制顺序
     // 0 -> 1 -> 2 绘制的是 右上 -> 左上 -> 左下 上半个三角形，逆时针方向，
     // 而 0 -> 2 -> 3 则绘制的是 右上 -> 左下 -> 右下 下半个三角形，也是逆时针方向，这两个三角形则“拼接”成了一个矩形。
     private static final short[] VERTEX_INDEX = {0, 1, 2, 0, 2, 3};
@@ -168,6 +169,7 @@ public class PictureFilterRender implements GLSurfaceView.Renderer {
         // 通过 glActiveTexture 激活指定编号的纹理,一共有32个
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         // 通过 glBindTexture 将新建的纹理和编号绑定起来, 绑定纹理句柄，将对象绑定到环境的纹理单元
+        // 使用glBindTexture函数将纹理对象绑定到OpenGL上下文中。这样，后续的纹理操作都将针对这个绑定的纹理对象进行
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexName);
 
         // 设置纹理对象的参数
@@ -245,7 +247,7 @@ public class PictureFilterRender implements GLSurfaceView.Renderer {
         GLES20.glUniform1f(filterXY, uXY);
 
         // 设置纹理值
-        GLES20.glUniform1i(mTexSamplerHandle, 0);
+        GLES20.glUniform1i(mTexSamplerHandle, GLES20.GL_TEXTURE0);
 
         // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,

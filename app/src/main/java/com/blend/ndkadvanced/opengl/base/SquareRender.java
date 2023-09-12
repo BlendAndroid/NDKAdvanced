@@ -68,7 +68,7 @@ public class SquareRender implements GLSurfaceView.Renderer {
                 .put(VERTEX);
         mVertexBuffer.position(0);
 
-        mVertexIndexBuffer = ByteBuffer.allocateDirect(VERTEX_INDEX.length * 2)
+        mVertexIndexBuffer = ByteBuffer.allocateDirect(VERTEX_INDEX.length * 2)// 一个short占两个字节
                 .order(ByteOrder.nativeOrder())
                 .asShortBuffer()
                 .put(VERTEX_INDEX);

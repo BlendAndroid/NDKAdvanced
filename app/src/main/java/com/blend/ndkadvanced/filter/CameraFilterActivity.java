@@ -36,6 +36,18 @@ public class CameraFilterActivity extends AppCompatActivity {
                     mBinding.btnFilterCameraView.setFragShader(4);
                 }
         );
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 生命周期对GLSurfaceView做处理
+        mBinding.btnFilterCameraView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBinding.btnFilterCameraView.onPause();
     }
 }

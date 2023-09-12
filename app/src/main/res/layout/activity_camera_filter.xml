@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".filter.CameraFilterActivity">
 
-    <com.blend.ndkadvanced.filter.CameraView
+    <com.blend.ndkadvanced.filter.CameraGLSurfaceView
         android:id="@+id/btnFilterCameraView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

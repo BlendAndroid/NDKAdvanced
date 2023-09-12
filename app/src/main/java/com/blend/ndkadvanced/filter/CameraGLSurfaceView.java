@@ -4,15 +4,15 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
-public class CameraView extends GLSurfaceView {
+public class CameraGLSurfaceView extends GLSurfaceView {
 
     private CameraRender renderer;
 
-    public CameraView(Context context) {
+    public CameraGLSurfaceView(Context context) {
         super(context);
     }
 
-    public CameraView(Context context, AttributeSet attrs) {
+    public CameraGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setEGLContextClientVersion(2);
         renderer = new CameraRender(this);
