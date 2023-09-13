@@ -88,7 +88,6 @@ public class EGLEnv {
         }
         screenFilter = new ScreenFilter(context);
         screenFilter.setSize(width,height);
-
     }
     public void draw(int textureId, long timestamp) {
         screenFilter.onDraw(textureId);
@@ -101,8 +100,7 @@ public class EGLEnv {
 
     public void release(){
         EGL14.eglDestroySurface(mEglDisplay,mEglSurface);
-        EGL14.eglMakeCurrent(mEglDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
-                EGL14.EGL_NO_CONTEXT);
+        EGL14.eglMakeCurrent(mEglDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT);
         EGL14.eglDestroyContext(mEglDisplay, mEglContext);
         EGL14.eglReleaseThread();
         EGL14.eglTerminate(mEglDisplay);

@@ -3,46 +3,48 @@ package com.blend.ndkadvanced.fbo;
 import android.content.Context;
 import android.opengl.GLES20;
 
-public class AbstractFboFilter  extends  AbstractFilter{
-//    cpu
+// 所有的渲染操作将会渲染到当前绑定帧缓冲的附件（纹理对象）中。由于帧缓冲不是默认帧缓冲，渲染指令将不会对窗口的视觉输出有任何影响。
+// 出于这个原因，渲染到一个不同的帧缓冲被叫做离屏渲染(Off-screen Rendering)。
+public abstract class AbstractFboFilter extends AbstractFilter {
+    // fbo对象
     int[] frameBuffer;
+    // 纹理对象
     int[] frameTextures;
+
     public AbstractFboFilter(Context context, int vertexShaderId, int fragmentShaderId) {
         super(context, vertexShaderId, fragmentShaderId);
     }
 
-//  初始化  fbo
     @Override
     public void setSize(int width, int height) {
-//    实例化  fbo     让摄像头的数据  先渲染到  fbo
         super.setSize(width, height);
         releaseFrame();
-        frameBuffer = new int[1];//int  gpu
-
+        // 让摄像头的数据先渲染到fbo
+        frameBuffer = new int[1];
+        // 用于生成帧缓冲对象（Framebuffer Object，FBO）的ID。
+        // 帧缓冲对象是用于将渲染操作输出到的缓冲区，它可以包含颜色缓冲区、深度缓冲区、模板缓冲区等。在使用帧缓冲对象之前，需要生成一个唯一的ID来标识该对象
         GLES20.glGenFramebuffers(1, frameBuffer, 0);
 
-//        生成一个纹理
-//        生成一个图层
-
-        //          //生成纹理
+        // 为帧缓冲创建一个纹理对象
+        // 用于存储生成的纹理对象
         frameTextures = new int[1];
+
+        // 生成纹理对象
+        // 用于存储和处理图像数据的OpenGL对象，可以用于将图像映射到几何图元上进行纹理贴图
         GLES20.glGenTextures(frameTextures.length, frameTextures, 0);
-//        配置纹理   yuv   rgb
+        // 配置纹理
         for (int i = 0; i < frameTextures.length; i++) {
-//                   后续的操作  是一个原子性
-            //绑定纹理，后续配置纹理     开始操作纹理
+            // 纹理单元GL_TEXTURE0默认总是被激活
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0); // 在绑定纹理之前先激活纹理单元
+            // 开始配置纹理，先将纹理对象绑定到当前活动的纹理单元
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, frameTextures[i]);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-                    GLES20.GL_NEAREST);//放大过滤
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                    GLES20.GL_LINEAR);//缩小过滤
-//gpu    操作 完了
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);//放大过滤
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);//缩小过滤
+            // 配置纹理结束，解除纹理句柄绑定
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         }
 
-//        99号  david  结清
-//我要开始做绑定操作
-//frameTextures
+        // 将新建的纹理和纹理单元绑定起来
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, frameTextures[0]);
         /**
          * 指定一个二维的纹理图片
@@ -61,21 +63,26 @@ public class AbstractFboFilter  extends  AbstractFilter{
          * data
          *     指定一个指向内存中图像数据的指针。
          */
+        // 这里传的data是null，对于这个纹理，仅仅分配了内存而没有填充它。填充这个纹理将会在我们渲染到帧缓冲之后来进行。
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height,
+                0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
-                null);
-
-//        要开始使用 gpu的    fbo  数据区域  gpu
+        // 将帧缓冲对象（Framebuffer Object，FBO）绑定到OpenGL上下文中，使得所有的渲染操作都会输出到该帧缓冲对象上
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);  //綁定FBO
 
-//        真正发生绑定   fbo  和 纹理  (图层)
+        // glFrameBufferTexture2D有以下的参数：
+        // target：帧缓冲的目标（绘制、读取或者两者皆有）
+        // attachment：我们想要附加的附件类型。当前我们正在附加一个颜色附件。注意最后的0意味着我们可以附加多个颜色附件。
+        // textarget：你希望附加的纹理类型
+        // texture：要附加的纹理本身
+        // level：多级渐远纹理的级别。我们将它保留为0。
+        // 真正发生绑定，将创建好的纹理对象，附加到帧缓冲对象上
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER,
                 GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D,
-                frameTextures[0],
-                0);
+                frameTextures[0], 0);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-//         opengl
+        // 要保证所有的渲染操作在主窗口中有视觉效果，需要再次激活默认帧缓冲，将它绑定到0
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
 
@@ -90,13 +97,19 @@ public class AbstractFboFilter  extends  AbstractFilter{
             GLES20.glDeleteFramebuffers(1, frameBuffer, 0);
         }
     }
+
     @Override
     public int onDraw(int texture) {
-//        数据渲染到  fbo中  屏幕 1   不是  2  输出设备 就是fbo
+        // 数据渲染到  fbo中
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
         super.onDraw(texture);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);  //
-        return frameTextures[0] ;
+        return frameTextures[0];
+    }
+
+    @Override
+    public void beforeDraw() {
+
     }
 
 }

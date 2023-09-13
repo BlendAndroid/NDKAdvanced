@@ -9,5 +9,4 @@ void main(){
     //Opengl 自带函数
     vec4 rgba = texture2D(vTexture, aCoord);
     gl_FragColor=rgba+vec4(0.1, 0.1, 0.0, 0.0);
-
 }

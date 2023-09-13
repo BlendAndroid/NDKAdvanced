@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".fbo.FBOActivity">
 
-    <com.blend.ndkadvanced.fbo.CameraView
-        android:id="@+id/fboCameraView"
+    <com.blend.ndkadvanced.fbo.CameraSurfaceView
+        android:id="@+id/fboCameraSurfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

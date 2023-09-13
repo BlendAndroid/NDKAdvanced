@@ -9,4 +9,8 @@ public class RecordFilter extends AbstractFilter{
         super(context, R.raw.fbo_base_vert, R.raw.fbo_base_frag);
     }
 
+    @Override
+    public void beforeDraw() {
+
+    }
 }

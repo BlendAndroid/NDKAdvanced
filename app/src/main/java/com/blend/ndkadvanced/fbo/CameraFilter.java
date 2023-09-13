@@ -7,22 +7,20 @@ import com.blend.ndkadvanced.R;
 
 public class CameraFilter extends AbstractFboFilter {
 
-//    渲染  屏幕     1     不是  2
     private float[] mtx;
-    private int vMatrix;
+    private final int vMatrix;
+
     public CameraFilter(Context context) {
-        super(context, R.raw.camera_vert, R.raw.camera_frag);
+        super(context, R.raw.camera_vert, R.raw.camera_frag2);
         vMatrix = GLES20.glGetUniformLocation(program, "vMatrix");
     }
 
     @Override
     public void beforeDraw() {
-        super.beforeDraw();
         GLES20.glUniformMatrix4fv(vMatrix, 1, false, mtx, 0);
     }
+
     public void setTransformMatrix(float[] mtx) {
         this.mtx = mtx;
     }
-
-
 }

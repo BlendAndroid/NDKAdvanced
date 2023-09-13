@@ -22,13 +22,13 @@ public class FBOActivity extends AppCompatActivity implements RadioGroup.OnCheck
             @Override
             public void onRecordStart() {
                 mBinding.btnFboRecord.setBackgroundResource(R.drawable.record_button_background_selected);
-                mBinding.fboCameraView.startRecord();
+                mBinding.fboCameraSurfaceView.startRecord();
             }
 
             @Override
             public void onRecordStop() {
                 mBinding.btnFboRecord.setBackgroundResource(R.drawable.record_button_background_unselected);
-                mBinding.fboCameraView.stopRecord();
+                mBinding.fboCameraSurfaceView.stopRecord();
             }
         });
 
@@ -39,20 +39,32 @@ public class FBOActivity extends AppCompatActivity implements RadioGroup.OnCheck
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch (checkedId) {
             case R.id.fboExtraSlow:
-                mBinding.fboCameraView.setSpeed(CameraView.Speed.MODE_EXTRA_SLOW);
+                mBinding.fboCameraSurfaceView.setSpeed(CameraSurfaceView.Speed.MODE_EXTRA_SLOW);
                 break;
             case R.id.fboSlow:
-                mBinding.fboCameraView.setSpeed(CameraView.Speed.MODE_SLOW);
+                mBinding.fboCameraSurfaceView.setSpeed(CameraSurfaceView.Speed.MODE_SLOW);
                 break;
             case R.id.btnFboNormal:
-                mBinding.fboCameraView.setSpeed(CameraView.Speed.MODE_NORMAL);
+                mBinding.fboCameraSurfaceView.setSpeed(CameraSurfaceView.Speed.MODE_NORMAL);
                 break;
             case R.id.fboFast:
-                mBinding.fboCameraView.setSpeed(CameraView.Speed.MODE_FAST);
+                mBinding.fboCameraSurfaceView.setSpeed(CameraSurfaceView.Speed.MODE_FAST);
                 break;
             case R.id.fboExtraFast:
-                mBinding.fboCameraView.setSpeed(CameraView.Speed.MODE_EXTRA_FAST);
+                mBinding.fboCameraSurfaceView.setSpeed(CameraSurfaceView.Speed.MODE_EXTRA_FAST);
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBinding.fboCameraSurfaceView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBinding.fboCameraSurfaceView.onPause();
     }
 }
