@@ -22,10 +22,8 @@ import android.view.Surface;
 import androidx.annotation.Nullable;
 
 import com.blend.ndkadvanced.R;
+import com.blend.ndkadvanced.utils.FileUtils;
 
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 // 需要注意的是，使用 Surface 进行视频编码或解码时，需要保证 Surface 的尺寸与视频的尺寸相匹配，否则可能会导致图像变形或者无法正常播放。
@@ -186,9 +184,9 @@ public class ScreenShortService extends Service {
                             byte[] outData = new byte[bufferInfo.size];
                             buffer.get(outData);
 
-                            writeContent(outData);  //以字符串的方式写入
+                            FileUtils.writeContent(outData);  //以字符串的方式写入
 
-                            writeBytes(outData);
+                            FileUtils.writeBytes(outData);
 
                             mediaCodec.releaseOutputBuffer(index, false);
                         }
@@ -211,55 +209,4 @@ public class ScreenShortService extends Service {
         isRunning = false;
 
     }
-
-    private void writeContent(byte[] array) {
-        char[] HEX_CHAR_TABLE = {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-        };
-        StringBuilder sb = new StringBuilder();
-        for (byte b : array) {
-            sb.append(HEX_CHAR_TABLE[(b & 0xf0) >> 4]);
-            sb.append(HEX_CHAR_TABLE[b & 0x0f]);
-        }
-        Log.i(TAG, "writeContent: " + sb.toString());
-        FileWriter writer = null;
-        try {
-            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
-            writer = new FileWriter(getBaseContext().getExternalCacheDir() + "/codec.txt", true);
-            writer.write(sb.toString());
-            writer.write("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void writeBytes(byte[] array) {
-        FileOutputStream writer = null;
-        try {
-            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
-            writer = new FileOutputStream(getBaseContext().getExternalCacheDir() + "/codec.h264", true);
-            writer.write(array);
-            writer.write('\n');
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
 }

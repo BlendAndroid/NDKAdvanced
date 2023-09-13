@@ -2,18 +2,15 @@ package com.blend.ndkadvanced;
 
 import android.app.Application;
 
+import com.blend.ndkadvanced.utils.FileUtils;
+
 public class NdkApplication extends Application {
 
-    public static NdkApplication application;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        application = new NdkApplication();
-    }
-
-    public static NdkApplication getApplication() {
-        return application;
+        FileUtils.init(this);
     }
 
 }

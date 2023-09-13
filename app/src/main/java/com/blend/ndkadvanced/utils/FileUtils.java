@@ -2,7 +2,6 @@ package com.blend.ndkadvanced.utils;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.FileInputStream;
@@ -14,14 +13,19 @@ import java.nio.channels.FileChannel;
 public class FileUtils {
     private static final String TAG = "FileUtils";
 
+    private static Context mContext;
+
+    public static void init(Context context) {
+        mContext = context;
+    }
+
     public static void writeBytes(byte[] array) {
         FileOutputStream writer = null;
         try {
             // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
-            writer = new FileOutputStream(Environment.getExternalStorageDirectory() + "/codec.h264", true);
+            writer = new FileOutputStream(mContext.getExternalCacheDir() + "/codec.h264", true);
             writer.write(array);
             writer.write('\n');
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -48,7 +52,7 @@ public class FileUtils {
         FileWriter writer = null;
         try {
             // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
-            writer = new FileWriter(Environment.getExternalStorageDirectory() + "/codecH264.txt", true);
+            writer = new FileWriter(mContext.getExternalCacheDir() + "/codecH264.txt", true);
             writer.write(sb.toString());
             writer.write("\n");
         } catch (IOException e) {
