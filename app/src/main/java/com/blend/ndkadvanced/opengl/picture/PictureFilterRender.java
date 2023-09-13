@@ -247,7 +247,7 @@ public class PictureFilterRender implements GLSurfaceView.Renderer {
         GLES20.glUniform1f(filterXY, uXY);
 
         // 设置纹理值
-        GLES20.glUniform1i(mTexSamplerHandle, GLES20.GL_TEXTURE0);
+        GLES20.glUniform1i(mTexSamplerHandle, 0);
 
         // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,

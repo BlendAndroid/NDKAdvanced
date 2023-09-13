@@ -125,7 +125,7 @@ public class ScreenFilter {
         GLES20.glActiveTexture(GL_TEXTURE0);
         // 将新建的纹理和编号绑定起来, 从texture采样
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
-        GLES20.glUniform1i(vTexture, GL_TEXTURE0);
+        GLES20.glUniform1i(vTexture, 0);
 
         GLES20.glUniformMatrix4fv(vMatrix, 1, false, mtx, 0);
         //通知渲染器

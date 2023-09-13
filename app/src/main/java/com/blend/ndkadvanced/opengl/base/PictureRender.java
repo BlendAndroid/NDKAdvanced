@@ -258,7 +258,7 @@ public class PictureRender implements GLSurfaceView.Renderer {
         // 通常情况下，我们使用的是GL_TEXTURE0纹理单元作为默认的纹理单元。因此，当在片段着色器中调用texture2D函数时，
         // 将纹理采样器的索引参数设置为0，表示从当前绑定到GL_TEXTURE0纹理单元的纹理数据中进行采样。
         // 因为之前绑定的纹理单元是0,所以这里设置的纹理单元就是0
-        GLES20.glUniform1i(mTexSamplerHandle, GLES20.GL_TEXTURE0);
+        GLES20.glUniform1i(mTexSamplerHandle, 0);
 
         // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,
