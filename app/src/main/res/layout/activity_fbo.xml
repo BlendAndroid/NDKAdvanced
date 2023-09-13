@@ -1,9 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fbo.FBOActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.blend.ndkadvanced.fbo.CameraView
+        android:id="@+id/fboCameraView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <RadioGroup
+        android:id="@+id/fboRgSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_above="@+id/btnFboRecord"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/record_speed_background"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/fboExtraSlow"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="极慢"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/fboSlow"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="慢"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/btnFboNormal"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:text="标准"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/fboFast"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="快"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/fboExtraFast"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="极快"
+            android:textColor="@drawable/record_speed_button_text" />
+    </RadioGroup>
+
+    <com.blend.ndkadvanced.utils.RecordButton
+        android:id="@+id/btnFboRecord"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/record_button_background_unselected"
+        android:gravity="center"
+        android:text="按住拍" />
+</RelativeLayout>

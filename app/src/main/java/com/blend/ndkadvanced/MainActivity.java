@@ -12,6 +12,7 @@ import com.blend.ndkadvanced.audio.AudioActivity;
 import com.blend.ndkadvanced.camera1.Camera1Activity;
 import com.blend.ndkadvanced.camerax.CameraXActivity;
 import com.blend.ndkadvanced.databinding.ActivityMainBinding;
+import com.blend.ndkadvanced.fbo.FBOActivity;
 import com.blend.ndkadvanced.filter.CameraFilterActivity;
 import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
@@ -97,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnFilter.setOnClickListener(v -> {
                     startActivity(new Intent(MainActivity.this, CameraFilterActivity.class));
+                }
+        );
+
+        binding.btnFbo.setOnClickListener(v -> {
+                    startActivity(new Intent(MainActivity.this, FBOActivity.class));
                 }
         );
 

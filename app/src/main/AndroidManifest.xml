@@ -34,7 +34,10 @@
             android:name=".opengl.base.BaseOpenGlLActivity"
             android:exported="false"
             android:label="基本图形" />
-        <activity android:name=".fbo.FBOActivity" />
+        <activity
+            android:name=".fbo.FBOActivity"
+            android:exported="false"
+            android:label="FBO" />
         <activity
             android:name=".filter.CameraFilterActivity"
             android:label="滤镜" />
