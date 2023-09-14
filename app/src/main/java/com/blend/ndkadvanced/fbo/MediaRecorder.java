@@ -65,7 +65,7 @@ public class MediaRecorder {
 
         //编码一个可以播放的视频
         //混合器 (复用器) 将编码的h.264封装为mp4
-        // mMuxer = new MediaMuxer(mPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        mMuxer = new MediaMuxer(mPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
         //开启编码
         mMediaCodec.start();
@@ -98,7 +98,8 @@ public class MediaRecorder {
             public void run() {
                 eglEnv.draw(textureId, timestamp);
                 // 获取对应的数据
-                codecH264(false);
+                // codecH264(false);
+                codec(false);
             }
         });
 
@@ -207,14 +208,15 @@ public class MediaRecorder {
             @Override
             public void run() {
                 Log.i(TAG, "线程: " + Thread.currentThread().getName());
-                codecH264(true);
+                // codecH264(true);
+                codec(true);
                 mMediaCodec.stop();
                 mMediaCodec.reset();
                 mMediaCodec.release();
                 mMediaCodec = null;
-                // mMuxer.stop();
-                // mMuxer.release();
-                // mMuxer = null;
+                mMuxer.stop();
+                mMuxer.release();
+                mMuxer = null;
                 eglEnv.release();
                 eglEnv = null;
                 mSurface = null;
