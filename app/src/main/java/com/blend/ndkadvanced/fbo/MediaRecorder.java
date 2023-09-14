@@ -30,7 +30,7 @@ public class MediaRecorder {
     private MediaMuxer mMuxer;
     private EGLContext mGlContext;
     private EGLEnv eglEnv;
-    private boolean isStart;
+    private volatile boolean isStart;
     private Context mContext;
 
     private long mLastTimeStamp;
@@ -65,7 +65,7 @@ public class MediaRecorder {
 
         //编码一个可以播放的视频
         //混合器 (复用器) 将编码的h.264封装为mp4
-        mMuxer = new MediaMuxer(mPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        // mMuxer = new MediaMuxer(mPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
         //开启编码
         mMediaCodec.start();
@@ -98,7 +98,7 @@ public class MediaRecorder {
             public void run() {
                 eglEnv.draw(textureId, timestamp);
                 // 获取对应的数据
-                codec(false);
+                codecH264(false);
             }
         });
 
@@ -123,7 +123,11 @@ public class MediaRecorder {
                 // 输出格式发生改变  第一次总会调用所以在这里开启混合器
                 MediaFormat newFormat = mMediaCodec.getOutputFormat();
                 track = mMuxer.addTrack(newFormat);
-                mMuxer.start();
+                if (track != -1) {
+                    mMuxer.start();
+                } else {
+                    Log.e(TAG, "codec: add track fail");
+                }
             } else if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 //可以忽略
             } else {
@@ -155,10 +159,10 @@ public class MediaRecorder {
                     Log.e(TAG, "codec: write");
 
                     // 写入H264数据到文件
-                    byte[] outData = new byte[bufferInfo.size];
-                    encodedData.get(outData);
-                    FileUtils.writeBytes(outData);
-                    FileUtils.writeContent(outData);
+                    // byte[] outData = new byte[bufferInfo.size];
+                    // encodedData.get(outData);
+                    // FileUtils.writeBytes(outData);
+                    // FileUtils.writeContent(outData);
 
                     //写出为mp4
                     mMuxer.writeSampleData(track, encodedData, bufferInfo);
@@ -167,6 +171,7 @@ public class MediaRecorder {
                 mMediaCodec.releaseOutputBuffer(index, false);
                 // 如果给了结束信号 signalEndOfInputStream
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    Log.e(TAG, "codec: BUFFER_FLAG_END_OF_STREAM");
                     break;
                 }
             }
@@ -176,7 +181,6 @@ public class MediaRecorder {
     private void codecH264(boolean endOfStream) {
         //给个结束信号
         if (endOfStream) {
-            mMediaCodec.signalEndOfInputStream();
             return;
         }
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
@@ -184,6 +188,7 @@ public class MediaRecorder {
         Log.i(TAG, "run: " + index);
         if (index >= 0) {
             ByteBuffer buffer = mMediaCodec.getOutputBuffer(index);
+            // 拿到编码格式
             MediaFormat mediaFormat = mMediaCodec.getOutputFormat(index);
             Log.i(TAG, "mediaFormat: " + mediaFormat.toString());
             byte[] outData = new byte[bufferInfo.size];
@@ -201,13 +206,15 @@ public class MediaRecorder {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                codec(true);
+                Log.i(TAG, "线程: " + Thread.currentThread().getName());
+                codecH264(true);
                 mMediaCodec.stop();
+                mMediaCodec.reset();
                 mMediaCodec.release();
                 mMediaCodec = null;
-                mMuxer.stop();
-                mMuxer.release();
-                mMuxer = null;
+                // mMuxer.stop();
+                // mMuxer.release();
+                // mMuxer = null;
                 eglEnv.release();
                 eglEnv = null;
                 mSurface = null;
