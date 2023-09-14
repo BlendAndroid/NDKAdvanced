@@ -19,7 +19,7 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
     private CameraHelper cameraHelper;
     private CameraSurfaceView cameraView;
     private SurfaceTexture mCameraTexure;
-    private RecordFilter recordFilter;
+    private ScreenFilter recordFilter;
     private MediaRecorder mRecorder;
     private CameraFilter cameraFilter;
     private int[] textures;
@@ -39,11 +39,11 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
         // 监听摄像头数据回调，
         mCameraTexure.setOnFrameAvailableListener(this);
 
-        // 设置相机拍摄滤镜
+        // 创建相机拍摄滤镜，并进行FBO离屏渲染
         cameraFilter = new CameraFilter(cameraView.getContext());
 
-        // 设置相机显示滤镜
-        recordFilter = new RecordFilter(cameraView.getContext());
+        // 创建相机显示滤镜
+        recordFilter = new ScreenFilter(cameraView.getContext());
 
         File file = new File(cameraView.getContext().getExternalCacheDir(), "fboOutput.mp4");
         if (file.exists()) {
@@ -76,7 +76,7 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
         // 将帧数据写入FBO(帧缓存对象)中，并返回FBO对象对应的纹理id
         int id = cameraFilter.onDraw(textures[0]);
 
-        // ，使用FBO中的纹理id作为输入纹理id绘制到屏幕上
+        // 使用FBO中的纹理id作为输入纹理id，做一次普通的渲染，绘制到屏幕上
         id = recordFilter.onDraw(id);
 
         // 使用FBO中的纹理id作为输入纹理id，作为MP4的输入源

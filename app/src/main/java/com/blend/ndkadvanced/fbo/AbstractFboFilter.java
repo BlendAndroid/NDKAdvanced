@@ -19,6 +19,8 @@ public abstract class AbstractFboFilter extends AbstractFilter {
     public void setSize(int width, int height) {
         super.setSize(width, height);
         releaseFrame();
+        // 下面是FBO的设置
+
         // 让摄像头的数据先渲染到fbo
         frameBuffer = new int[1];
         // 用于生成帧缓冲对象（Framebuffer Object，FBO）的ID。
@@ -68,7 +70,7 @@ public abstract class AbstractFboFilter extends AbstractFilter {
                 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 
         // 将帧缓冲对象（Framebuffer Object，FBO）绑定到OpenGL上下文中，使得所有的渲染操作都会输出到该帧缓冲对象上
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);  //綁定FBO
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);  //绑定FBO
 
         // glFrameBufferTexture2D有以下的参数：
         // target：帧缓冲的目标（绘制、读取或者两者皆有）
@@ -81,8 +83,9 @@ public abstract class AbstractFboFilter extends AbstractFilter {
                 GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D,
                 frameTextures[0], 0);
 
+        // 解绑纹理
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-        // 要保证所有的渲染操作在主窗口中有视觉效果，需要再次激活默认帧缓冲，将它绑定到0
+        // 解绑FBO
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
 
@@ -100,10 +103,13 @@ public abstract class AbstractFboFilter extends AbstractFilter {
 
     @Override
     public int onDraw(int texture) {
-        // 数据渲染到  fbo中
+        // 绑定FBO
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
+        // 也就是再走一遍渲染的流程，选定离屏渲染的 Program，绑定 VAO 和图像纹理
+        // 进行绘制（离屏渲染）
         super.onDraw(texture);
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);  //
+        // 解绑FBO
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         return frameTextures[0];
     }
 

@@ -65,7 +65,7 @@ public abstract class AbstractFilter {
         mHeight = height;
     }
 
-    //获取到摄像头纹理数据,开始渲染
+
     public int onDraw(int texture) {
         GLES20.glViewport(0, 0, mWidth, mHeight);
         GLES20.glUseProgram(program);

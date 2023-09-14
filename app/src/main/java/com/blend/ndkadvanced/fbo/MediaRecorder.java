@@ -28,11 +28,10 @@ public class MediaRecorder {
     private Handler mHandler;
     // 编码封装格式
     private MediaMuxer mMuxer;
-    private EGLContext mGlContext;
+    private final EGLContext mGlContext;
     private EGLEnv eglEnv;
     private volatile boolean isStart;
-    private Context mContext;
-
+    private final Context mContext;
     private long mLastTimeStamp;
     private int track;
     private float mSpeed;
@@ -76,16 +75,18 @@ public class MediaRecorder {
         handlerThread.start();
         mHandler = new Handler(handlerThread.getLooper());
 
+        //子线程：EGL的绑定线程，对创建EGL环境的opengl操作都在这个线程当中执行
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                // 创建OpenGL的环境
+                // 创建OpenGL的环境，传入OpenGl上下文
                 eglEnv = new EGLEnv(mContext, mGlContext, mSurface, mWidth, mHeight);
                 isStart = true;
             }
         });
 
     }
+
 
     // 开始编码，根据textureId纹理数据，进行编码
     public void fireFrame(final int textureId, final long timestamp) {
@@ -99,6 +100,7 @@ public class MediaRecorder {
                 eglEnv.draw(textureId, timestamp);
                 // 获取对应的数据
                 // codecH264(false);
+                // 向虚拟屏幕渲染后，就可以通过MediaCodec拿到编码后的数据了
                 codec(false);
             }
         });
