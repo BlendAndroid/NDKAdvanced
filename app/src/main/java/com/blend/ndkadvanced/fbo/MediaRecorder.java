@@ -162,10 +162,10 @@ public class MediaRecorder {
                     Log.e(TAG, "codec: write");
 
                     // 写入H264数据到文件
-                    // byte[] outData = new byte[bufferInfo.size];
-                    // encodedData.get(outData);
-                    // FileUtils.writeBytes(outData);
-                    // FileUtils.writeContent(outData);
+                    byte[] outData = new byte[bufferInfo.size];
+                    encodedData.get(outData);
+                    FileUtils.writeBytes(outData);
+                    FileUtils.writeContent(outData);
 
                     //写出为mp4
                     mMuxer.writeSampleData(track, encodedData, bufferInfo);

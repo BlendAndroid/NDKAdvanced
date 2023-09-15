@@ -25,7 +25,7 @@ public class EGLEnv {
     private final EGLContext mEglContext;
     private final EGLSurface mEglSurface;
 
-    private ScreenFilter screenFilter;
+    private AbstractFilter screenFilter;
 
     // mediacodec  提供的场地
     public EGLEnv(Context context, EGLContext mGlContext, Surface surface, int width, int height) {
@@ -85,8 +85,8 @@ public class EGLEnv {
         if (!EGL14.eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)) {
             throw new RuntimeException("EGL error " + EGL14.eglGetError());
         }
-        // 进行一次普通的渲染，向虚拟屏幕上渲染
-        screenFilter = new ScreenFilter(context);
+        // 进行一次普通的渲染，向虚拟屏幕上渲染,在这里设置的滤镜,是用于保存mp4视频的
+        screenFilter = new SplitFilter(context);
         screenFilter.setSize(width, height);
     }
 

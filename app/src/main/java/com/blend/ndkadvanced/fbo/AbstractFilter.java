@@ -16,12 +16,12 @@ public abstract class AbstractFilter {
 
     public int program;
 
-    private int vPosition;
-    FloatBuffer textureBuffer; // 纹理坐标
-    private int vCoord;
-    private int vTexture;
-    private int mWidth;
-    private int mHeight;
+    private final int vPosition;
+    private final FloatBuffer textureBuffer; // 纹理坐标
+    private final int vCoord;
+    private final int vTexture;
+    protected int mWidth;
+    protected int mHeight;
     FloatBuffer vertexBuffer; //gpu顶点缓冲区
     float[] VERTEX = {
             -1.0f, -1.0f,
@@ -64,7 +64,6 @@ public abstract class AbstractFilter {
         mWidth = width;
         mHeight = height;
     }
-
 
     public int onDraw(int texture) {
         GLES20.glViewport(0, 0, mWidth, mHeight);

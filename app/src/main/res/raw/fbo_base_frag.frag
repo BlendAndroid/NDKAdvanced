@@ -6,5 +6,5 @@ uniform sampler2D  vTexture;
 void main(){
     //  texture2D: vTexture采样器，采样  aCoord 这个像素点的RGBA值
     vec4 rgba = texture2D(vTexture, aCoord);//rgba
-    gl_FragColor = rgba;
+    gl_FragColor = rgba + vec4(0.1, 0.1, 0.0, 0.0);;
 }

@@ -3,7 +3,6 @@ package com.blend.ndkadvanced.fbo;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 
 import androidx.camera.core.Preview;
 import androidx.lifecycle.LifecycleOwner;
@@ -19,7 +18,7 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
     private CameraHelper cameraHelper;
     private CameraSurfaceView cameraView;
     private SurfaceTexture mCameraTexure;
-    private ScreenFilter recordFilter;
+    private AbstractFilter recordFilter;
     private MediaRecorder mRecorder;
     private CameraFilter cameraFilter;
     private int[] textures;
@@ -39,11 +38,12 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
         // 监听摄像头数据回调，
         mCameraTexure.setOnFrameAvailableListener(this);
 
-        // 进行FBO离屏渲染, 并进行滤镜处理
+        // 进行FBO离屏渲染, 并进行滤镜处理,但是这个时候进行滤镜处理,因为还要进行摄像头旋转,导致处理的滤镜x和y也旋转了
+        // 所以在这里最好只进行FBO的渲染
         cameraFilter = new CameraFilter(cameraView.getContext());
 
-        // surface显示相机拍摄结果,进行普通渲染
-        recordFilter = new ScreenFilter(cameraView.getContext());
+        // surface显示相机拍摄结果,进行普通渲染,在这里进行滤镜处理
+        recordFilter = new BeautyFilter(cameraView.getContext());
 
         File file = new File(cameraView.getContext().getExternalCacheDir(), "fboOutput.mp4");
         if (file.exists()) {
