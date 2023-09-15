@@ -11,6 +11,69 @@
         android:layout_height="match_parent" />
 
     <RadioGroup
+        android:id="@+id/fboRgFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_above="@+id/fboRgSpeed"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/record_speed_background"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/fboSoul"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="灵魂出窍"
+            android:textColor="@drawable/record_speed_button_text"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/fboBeauty"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="美颜"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/fboNormal"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:text="正常"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/fboSplit2"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="二屏"
+            android:textColor="@drawable/record_speed_button_text" />
+
+        <RadioButton
+            android:id="@+id/fboSplit3"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/record_speed_button_background"
+            android:button="@null"
+            android:gravity="center"
+            android:text="三屏"
+            android:textColor="@drawable/record_speed_button_text" />
+    </RadioGroup>
+
+    <RadioGroup
         android:id="@+id/fboRgSpeed"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
@@ -82,4 +145,6 @@
         android:background="@drawable/record_button_background_unselected"
         android:gravity="center"
         android:text="按住拍" />
+
+
 </RelativeLayout>

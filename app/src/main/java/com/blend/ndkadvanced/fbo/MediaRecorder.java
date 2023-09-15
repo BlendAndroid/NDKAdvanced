@@ -227,4 +227,10 @@ public class MediaRecorder {
             }
         });
     }
+
+    public void setSplit(CameraSurfaceView.Split split) {
+        if (eglEnv != null) {
+            eglEnv.setSplit(split);
+        }
+    }
 }

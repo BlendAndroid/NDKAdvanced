@@ -26,9 +26,16 @@ public class EGLEnv {
     private final EGLSurface mEglSurface;
 
     private AbstractFilter screenFilter;
+    private CameraSurfaceView.Split mSplit;
+    private final Context mContext;
+    private final int mWidth;
+    private final int mHeight;
 
     // mediacodec  提供的场地
     public EGLEnv(Context context, EGLContext mGlContext, Surface surface, int width, int height) {
+        mContext = context;
+        mWidth = width;
+        mHeight = height;
         // 获得显示窗口，作为OpenGL的绘制目标
         mEglDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
 
@@ -86,11 +93,36 @@ public class EGLEnv {
             throw new RuntimeException("EGL error " + EGL14.eglGetError());
         }
         // 进行一次普通的渲染，向虚拟屏幕上渲染,在这里设置的滤镜,是用于保存mp4视频的
-        screenFilter = new SplitFilter(context);
+        screenFilter = new ScreenFilter(context);
         screenFilter.setSize(width, height);
     }
 
     public void draw(int textureId, long timestamp) {
+        if (mSplit != null) {
+            if (screenFilter != null) {
+                screenFilter.release();
+                screenFilter = null;
+            }
+            switch (mSplit) {
+                case MODE_SOUL:
+                    screenFilter = new SoulFilter(mContext);
+                    break;
+                case MODE_BEAUTY:
+                    screenFilter = new BeautyFilter(mContext);
+                    break;
+                case MODE_NORMAL:
+                    screenFilter = new ScreenFilter(mContext);
+                    break;
+                case MODE_SPLIT2:
+                    screenFilter = new SplitFilterTwo(mContext);
+                    break;
+                case MODE_SPLIT3:
+                    screenFilter = new SplitFilterThree(mContext);
+                    break;
+            }
+            screenFilter.setSize(mWidth, mHeight);
+            mSplit = null;
+        }
         // 画到虚拟屏幕上，就是向MediaCodec创建的Surface上进行渲染
         // 就像屏幕共享的时候，也是向虚拟屏幕进行渲染的
         screenFilter.onDraw(textureId);
@@ -111,5 +143,9 @@ public class EGLEnv {
         EGL14.eglReleaseThread();
         EGL14.eglTerminate(mEglDisplay);
         screenFilter.release();
+    }
+
+    public void setSplit(CameraSurfaceView.Split split) {
+        mSplit = split;
     }
 }

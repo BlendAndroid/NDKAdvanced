@@ -33,6 +33,7 @@ public class FBOActivity extends AppCompatActivity implements RadioGroup.OnCheck
         });
 
         mBinding.fboRgSpeed.setOnCheckedChangeListener(this);
+        mBinding.fboRgFilter.setOnCheckedChangeListener(this);
     }
 
     @Override
@@ -52,6 +53,21 @@ public class FBOActivity extends AppCompatActivity implements RadioGroup.OnCheck
                 break;
             case R.id.fboExtraFast:
                 mBinding.fboCameraSurfaceView.setSpeed(CameraSurfaceView.Speed.MODE_EXTRA_FAST);
+                break;
+            case R.id.fboSoul:
+                mBinding.fboCameraSurfaceView.setSplit(CameraSurfaceView.Split.MODE_SOUL);
+                break;
+            case R.id.fboBeauty:
+                mBinding.fboCameraSurfaceView.setSplit(CameraSurfaceView.Split.MODE_BEAUTY);
+                break;
+            case R.id.fboNormal:
+                mBinding.fboCameraSurfaceView.setSplit(CameraSurfaceView.Split.MODE_NORMAL);
+                break;
+            case R.id.fboSplit2:
+                mBinding.fboCameraSurfaceView.setSplit(CameraSurfaceView.Split.MODE_SPLIT2);
+                break;
+            case R.id.fboSplit3:
+                mBinding.fboCameraSurfaceView.setSplit(CameraSurfaceView.Split.MODE_SPLIT3);
                 break;
         }
     }

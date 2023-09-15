@@ -14,7 +14,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOutputUpdateListener, SurfaceTexture.OnFrameAvailableListener {
-    private static final String TAG = "david";
+
     private CameraHelper cameraHelper;
     private CameraSurfaceView cameraView;
     private SurfaceTexture mCameraTexure;
@@ -23,6 +23,9 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
     private CameraFilter cameraFilter;
     private int[] textures;
     float[] mtx = new float[16];
+    private CameraSurfaceView.Split mSplit;
+    private int mWidth;
+    private int mHeight;
 
     public CameraRender(CameraSurfaceView cameraView) {
         this.cameraView = cameraView;
@@ -43,7 +46,7 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
         cameraFilter = new CameraFilter(cameraView.getContext());
 
         // surface显示相机拍摄结果,进行普通渲染,在这里进行滤镜处理
-        recordFilter = new BeautyFilter(cameraView.getContext());
+        recordFilter = new ScreenFilter(cameraView.getContext());
 
         File file = new File(cameraView.getContext().getExternalCacheDir(), "fboOutput.mp4");
         if (file.exists()) {
@@ -56,6 +59,8 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        mWidth = width;
+        mHeight = height;
         cameraFilter.setSize(width, height);
         recordFilter.setSize(width, height);
     }
@@ -75,6 +80,32 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
 
         // 将帧数据写入FBO(帧缓存对象)中，并返回FBO对象对应的纹理id
         int id = cameraFilter.onDraw(textures[0]);
+
+        if (mSplit != null) {
+            if (recordFilter != null) {
+                recordFilter.release();
+                recordFilter = null;
+            }
+            switch (mSplit) {
+                case MODE_SOUL:
+                    recordFilter = new SoulFilter(cameraView.getContext());
+                    break;
+                case MODE_BEAUTY:
+                    recordFilter = new BeautyFilter(cameraView.getContext());
+                    break;
+                case MODE_NORMAL:
+                    recordFilter = new ScreenFilter(cameraView.getContext());
+                    break;
+                case MODE_SPLIT2:
+                    recordFilter = new SplitFilterTwo(cameraView.getContext());
+                    break;
+                case MODE_SPLIT3:
+                    recordFilter = new SplitFilterThree(cameraView.getContext());
+                    break;
+            }
+            recordFilter.setSize(mWidth, mHeight);
+            mSplit = null;
+        }
 
         // 使用FBO中的纹理id作为输入纹理id，做一次普通的渲染，绘制到屏幕上
         id = recordFilter.onDraw(id);
@@ -106,5 +137,10 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
 
     public void stopRecord() {
         mRecorder.stop();
+    }
+
+    public void setSplit(CameraSurfaceView.Split split) {
+        mSplit = split;
+        mRecorder.setSplit(split);
     }
 }

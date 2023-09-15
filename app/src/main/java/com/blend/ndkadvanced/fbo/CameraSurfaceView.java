@@ -25,8 +25,16 @@ public class CameraSurfaceView extends GLSurfaceView {
         MODE_EXTRA_SLOW, MODE_SLOW, MODE_NORMAL, MODE_FAST, MODE_EXTRA_FAST
     }
 
+    public enum Split {
+        MODE_SOUL, MODE_BEAUTY, MODE_NORMAL, MODE_SPLIT2, MODE_SPLIT3
+    }
+
     public void setSpeed(Speed speed) {
         this.mSpeed = speed;
+    }
+
+    public void setSplit(Split split) {
+        renderer.setSplit(split);
     }
 
     /**
