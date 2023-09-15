@@ -3,7 +3,7 @@
 //所有float类型数据的精度是lowp
 precision mediump float;
 varying vec2 aCoord;
-//采样器  uniform是static的意思
+//采样器  uniform是static的意思 android用来渲染 相机数据
 uniform samplerExternalOES vTexture;
 void main(){
     //Opengl 自带函数

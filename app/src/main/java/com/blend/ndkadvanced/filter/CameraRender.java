@@ -75,8 +75,16 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
         // 更新纹理图像，将从图像流中获得的最新图像更新到OpenGL ES纹理对象中。
         mCameraTexture.updateTexImage();
 
-        // 获取重采样纹理矩阵
+        // android的后置相机的预览的图像是顺时针旋转90°的，而相对于前置相机则是逆时针旋转90°的，
+        // 如果想要跟照镜子一样的模式，自拍则还要左右对换。
+        // 获取重采样纹理矩阵,就是为了摄像头的数据旋转90
         mCameraTexture.getTransformMatrix(mtx);
+
+        // 获取到的矩阵数据
+        // [0.0, -1.0, 0.0, 0.0,
+        // -1.0, 0.0, 0.0, 0.0,
+        // 0.0, 0.0, 1.0, 0.0,
+        // 1.0, 1.0, 0.0, 1.0]
 
         screenFilter.setTransformMatrix(mtx);
         // 设置摄像头数据

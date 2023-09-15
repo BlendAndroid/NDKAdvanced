@@ -11,7 +11,7 @@ public class CameraFilter extends AbstractFboFilter {
     private final int vMatrix;
 
     public CameraFilter(Context context) {
-        super(context, R.raw.camera_vert, R.raw.camera_frag);
+        super(context, R.raw.camera_vert, R.raw.camera_frag2);
         vMatrix = GLES20.glGetUniformLocation(program, "vMatrix");
     }
 
