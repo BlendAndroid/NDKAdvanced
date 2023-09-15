@@ -6,7 +6,7 @@ import com.blend.ndkadvanced.R;
 
 public class ScreenFilter extends AbstractFilter {
     public ScreenFilter(Context context) {
-        super(context, R.raw.fbo_base_vert, R.raw.fbo_base_frag);
+        super(context, R.raw.fbo_base_vert, R.raw.camera_frag2);
     }
 
     @Override

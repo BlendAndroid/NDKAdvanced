@@ -39,10 +39,10 @@ public class CameraRender implements GLSurfaceView.Renderer, Preview.OnPreviewOu
         // 监听摄像头数据回调，
         mCameraTexure.setOnFrameAvailableListener(this);
 
-        // 创建相机拍摄滤镜，并进行FBO离屏渲染
+        // 进行FBO离屏渲染
         cameraFilter = new CameraFilter(cameraView.getContext());
 
-        // 创建相机显示滤镜
+        // surface显示相机,并进行滤镜处理
         recordFilter = new ScreenFilter(cameraView.getContext());
 
         File file = new File(cameraView.getContext().getExternalCacheDir(), "fboOutput.mp4");

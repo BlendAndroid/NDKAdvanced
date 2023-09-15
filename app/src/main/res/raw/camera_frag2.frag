@@ -4,7 +4,7 @@
 precision mediump float;
 varying vec2 aCoord;
 //采样器  uniform static
-uniform samplerExternalOES vTexture;
+uniform sampler2D vTexture;
 void main(){
     //Opengl 自带函数
     vec4 rgba = texture2D(vTexture, aCoord);
