@@ -23,6 +23,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".ffmpeg.FfmpegActivity"
+            android:exported="false"
+            android:label="ffmpeg" />
+        <activity
             android:name=".mmkv.MMKVActivity"
             android:exported="false"
             android:label="MMKV" />

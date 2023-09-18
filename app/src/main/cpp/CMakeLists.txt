@@ -9,11 +9,14 @@ file(GLOB x264_source ./x264/*.cpp)
 #x264和faac头文件引入
 include_directories(${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/include)
 include_directories(${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/include)
+#ffmpeg头文件引入
+include_directories(${CMAKE_SOURCE_DIR}/ffmpeg/include)
 
 #x264和faac静态库
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/lib")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/lib")
-
+#ffmpeg动态库
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}")
 
 # add_library(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] [source])
 # 将一组源文件 source 编译出一个库文件，并保存为 libname.so，其中有三种库文件类型，不写的话，默认为 STATIC
@@ -34,6 +37,7 @@ add_library(
         mmkv/MMKV_main.cpp
         mmkv/MMKV.cpp
         mmkv/ProtoBuf.cpp
+        ffmpeg/ffmpeg_main.cpp
 )
 
 # find_library(name1 path1 path2 ...) 将一个变量和Android NDK的某个库建立关联关系。
@@ -51,7 +55,16 @@ target_link_libraries(
         ${log-lib}
         librtmp
         x264
-        faac)
+        faac
+        avcodec
+        avdevice
+        avfilter
+        avformat
+        avutil
+        swresample
+        swscale
+        android
+)
 
 #set(变量名 变量值)
 

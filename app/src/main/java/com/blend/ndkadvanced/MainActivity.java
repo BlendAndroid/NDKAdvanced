@@ -13,6 +13,7 @@ import com.blend.ndkadvanced.camera1.Camera1Activity;
 import com.blend.ndkadvanced.camerax.CameraXActivity;
 import com.blend.ndkadvanced.databinding.ActivityMainBinding;
 import com.blend.ndkadvanced.fbo.FBOActivity;
+import com.blend.ndkadvanced.ffmpeg.FfmpegActivity;
 import com.blend.ndkadvanced.filter.CameraFilterActivity;
 import com.blend.ndkadvanced.gif.GifDemoActivity;
 import com.blend.ndkadvanced.golomb.GolombActivity;
@@ -108,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnMMKV.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, MMKVActivity.class));
+        });
+
+        binding.btnFfmpeg.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, FfmpegActivity.class));
         });
     }
 

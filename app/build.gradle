@@ -20,6 +20,7 @@ android {
                 abiFilters 'armeabi-v7a'
             }
         }
+        // 把so文件打包到apk中
         ndk{
             abiFilters 'armeabi-v7a'
         }
@@ -34,6 +35,13 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            // 指定so文件的地址
+            jniLibs.srcDirs = ['src/main/cpp/ffmpeg/libs']
+        }
     }
 
     // 指定CMakeLists.txt的地址，这是一个NDK工程
