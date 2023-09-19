@@ -127,7 +127,7 @@ Java_com_blend_ndkadvanced_ffmpeg_FfmpegActivity_play(JNIEnv *env, jobject thiz,
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         // 找出视频数据
         if (avPacket->stream_index == videoIndex) {
-            // 发送数据到ffmepg，放到解码队列中
+            // 发送数据到ffmpeg，放到解码队列中
             int ret = avcodec_send_packet(avCodecContext, avPacket);
             if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
                 LOGE("解码出错");
@@ -208,88 +208,115 @@ Java_com_blend_ndkadvanced_ffmpeg_FfmpegActivity_playSound(JNIEnv *env, jobject 
                                                            jstring input_) {
     const char *input = env->GetStringUTFChars(input_, 0);
     av_register_all();
-//    总上下文
     AVFormatContext *pFormatCtx = avformat_alloc_context();
     if (avformat_open_input(&pFormatCtx, input, NULL, NULL) != 0) {
-        LOGE("%s", "打开输入视频文件失败");
+        LOGE("%s", "打开输入音频文件失败");
         return;
     }
     if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
-        LOGE("%s", "获取视频信息失败");
+        LOGE("%s", "获取音频信息失败");
         return;
     }
+    // 音频索引
     int audio_stream_idx = -1;
-    int i = 0;
     for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-            LOGE("  找到音频id %d", pFormatCtx->streams[i]->codec->codec_type);
+        // streams 是一个二级指针（指针数组），存放的是媒体文件中的流数据， 如 音频流 视频流 以及字幕流
+        // avStream->codec_type : AVCodecParameters 编解码器参数 里面存放了编解码器相关的信息
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            LOGE("找到音频id %d", pFormatCtx->streams[i]->codec->codec_type);
             audio_stream_idx = i;
             break;
         }
     }
-//    找到了音频索引
 
-//找到解码器上下文
+    // 解码器上下文
     AVCodecContext *pCodecCtx = pFormatCtx->streams[audio_stream_idx]->codec;
-    //获取解码器  视频 1   音频2
+    // 获取解码器, 每种视频（音频）编解码器(例如H.264解码器)对应一个该结构体
+    // 通过编解码器上下文中的编解码器id查找到对应的编解码器
     AVCodec *pCodex = avcodec_find_decoder(pCodecCtx->codec_id);
-    //打开解码器
+    // 打开解码器, 此时编解码器上下文才可以用
     if (avcodec_open2(pCodecCtx, pCodex, NULL) < 0) {
         return;
     }
-    AVPacket *packet = (AVPacket *) av_malloc(sizeof(AVPacket));
 
-    //申请avframe，装解码后的数据
-    AVFrame *frame = av_frame_alloc();
-    int out_channer_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
-//转换器上下文
+    // 接下来是:主要就是从过AVFormatContext 取出一个AVPacket数据 然后交给 AVCodecContext转换成 AVFrame数据
+    // 保存解码之前的数据和一些附加信息，如显示时间戳（pts）、解码时间戳（dts）、数据时长，所在媒体流的索引等
+    AVPacket *packet = av_packet_alloc();   // 申请一个AVPacket结构体,空的
+
+    // 申请AVFrame，装解码后的数据,就是pcm数据
+    AVFrame *frame = av_frame_alloc();  // 申请一个AVFrame结构体
+
+    // 音频转换器上下文,用于进行重采样
     SwrContext *swrContext = swr_alloc();
-    uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
-    enum AVSampleFormat out_formart = AV_SAMPLE_FMT_S16;
-    int out_sample_rate = pCodecCtx->sample_rate;
-//    转换器的代码
-    swr_alloc_set_opts(swrContext, out_ch_layout, out_formart, out_sample_rate,
-//            输出的
-                       pCodecCtx->channel_layout, pCodecCtx->sample_fmt, pCodecCtx->sample_rate, 0,
-                       NULL
-    );
+    uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;   //双通道
+    enum AVSampleFormat sampleFormat = AV_SAMPLE_FMT_S16;   // 采样格式16位
+    int out_sample_rate = pCodecCtx->sample_rate;   // 采样率最好采用动态获取
+    // 设置重采样参数
+    // 转换器的代码，设置输出和输入格式， 其中采样率最好采用动态获取，因为每个音频的采样率可能不同
+    // 参数说明：
+    //- s：SwrContext对象，如果为NULL，则会自动分配一个新的SwrContext。
+    //- out_ch_layout：输出音频布局（通道数）。
+    //- out_sample_fmt：输出音频采样格式。
+    //- out_sample_rate：输出音频采样率。
+    //- in_ch_layout：输入音频布局（通道布局）。
+    //- in_sample_fmt：输入音频采样格式。
+    //- in_sample_rate：输入音频采样率。
+    //- log_offset：日志输出偏移量。
+    //- log_ctx：与日志输出相关的上下文。
+    swr_alloc_set_opts(swrContext, out_ch_layout, sampleFormat, out_sample_rate,
+                       pCodecCtx->channel_layout, pCodecCtx->sample_fmt,
+                       pCodecCtx->sample_rate, 0, NULL);
 
-//    初始化转化上下文
+    // 初始化转化上下文
     swr_init(swrContext);
-//    1s的pcm个数
+
+    // 反射的方式初始化AudioTrack
+    jclass audioPlayer = env->GetObjectClass(instance);
+    jmethodID createAudio = env->GetMethodID(audioPlayer, "createTrack", "(II)V");
+    // 用于获取指定通道布局中的通道数量
+    int out_channel_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+    env->CallVoidMethod(instance, createAudio, 44100, out_channel_nb);
+
+    jmethodID audio_write = env->GetMethodID(audioPlayer, "playTrack", "([BI)V");
+
+    // 实例化一个输出缓冲区的大小，就是1s的pcm个数
     uint8_t *out_buffer = (uint8_t *) av_malloc(44100 * 2);
-//    反射的放射的方式
-    jclass david_player = env->GetObjectClass(instance);
-    jmethodID createAudio = env->GetMethodID(david_player, "createTrack", "(II)V");
-    env->CallVoidMethod(instance, createAudio, 44100, out_channer_nb);
-    jmethodID audio_write = env->GetMethodID(david_player, "playTrack", "([BI)V");
-    int got_frame;
-    while (av_read_frame(pFormatCtx, packet) >= 0) {
+
+    while (av_read_frame(pFormatCtx, packet) >= 0) { // 从AVFormatContext中读出一帧数据给AVPacket
 
         if (packet->stream_index == audio_stream_idx) {
-//            音频的数据
-            avcodec_decode_audio4(pCodecCtx, frame, &got_frame, packet);
-            if (got_frame >= 0) {
-
-//输出的我们写完了    我们再写输入数据
-                swr_convert(swrContext, &out_buffer, 44100 * 2,
-                            (const uint8_t **) (frame->data), frame->nb_samples);
-
-//                解码了
-                int size = av_samples_get_buffer_size(NULL, out_channer_nb, frame->nb_samples,
-                                                      AV_SAMPLE_FMT_S16, 1);
-//java的字节数组
-                jbyteArray audio_sample_array = env->NewByteArray(size);
-                env->SetByteArrayRegion(audio_sample_array, 0, size,
-                                        reinterpret_cast<const jbyte *>(out_buffer));
-                env->CallVoidMethod(instance, audio_write, audio_sample_array, size);
-                env->DeleteLocalRef(audio_sample_array);
+            // 发送数据到ffmpeg，放到解码队列中
+            int ret = avcodec_send_packet(pCodecCtx, packet);
+            if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+                LOGE("解码出错");
+                return;
             }
 
+            // 将成功的解码队列中取出一帧数据, frame会每次清掉上一次frame，然后重新赋值，可以给同一个frame
+            ret = avcodec_receive_frame(pCodecCtx, frame);
+            if (ret == AVERROR(EAGAIN)) {
+                continue;
+            } else if (ret < 0) {
+                break;
+            }
 
+            // 音频重采样
+            // 声卡要求音频输出格式统一（采用率统一，通道数统一，...）
+            // 把PCM原始音频数据处理成统一格式
+            swr_convert(swrContext, &out_buffer, 44100 * 2,
+                        (const uint8_t **) (frame->data), frame->nb_samples);
+
+            // 计算指定参数下音频采样数据的缓冲区大小
+            int size = av_samples_get_buffer_size(NULL, out_channel_nb, frame->nb_samples,
+                                                  AV_SAMPLE_FMT_S16, 1);
+
+            // java的字节数组,并调用AudioTrack的write方法进行播放
+            jbyteArray audio_sample_array = env->NewByteArray(size);
+            env->SetByteArrayRegion(audio_sample_array, 0, size,
+                                    reinterpret_cast<const jbyte *>(out_buffer));
+            env->CallVoidMethod(instance, audio_write, audio_sample_array, size);
+            env->DeleteLocalRef(audio_sample_array);
         }
-
-
     }
 
     av_frame_free(&frame);
@@ -297,8 +324,6 @@ Java_com_blend_ndkadvanced_ffmpeg_FfmpegActivity_playSound(JNIEnv *env, jobject 
     swr_free(&swrContext);
     avcodec_close(pCodecCtx);
     avformat_close_input(&pFormatCtx);
-//    子线程  虚拟机绑定     jvm虚拟机
 
     env->ReleaseStringUTFChars(input_, input);
-
 }
