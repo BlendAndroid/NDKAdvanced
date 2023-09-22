@@ -12,11 +12,27 @@ include_directories(${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/include)
 #ffmpeg头文件引入
 include_directories(${CMAKE_SOURCE_DIR}/ffmpeg/include)
 
+#soundtouch头文件引入
+include_directories(soundtouch/include)
+include_directories(soundtouch/SoundTouch)
+
+#util头文件引入
+include_directories(util/include)
+include_directories(util/JNI_UTIL)
+
 #x264和faac静态库
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/lib")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/lib")
 #ffmpeg动态库
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}")
+
+#配置soundtouch到SOUNDTOUCH_SRC
+aux_source_directory(./soundtouch/SoundTouch SOUNDTOUCH_SRC)
+
+aux_source_directory(./ffmpegaudio FFMPEG_AUDIO_SRC)
+
+aux_source_directory(./util/JNI_UTIL JNI_UTIL_SRC)
+
 
 # add_library(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] [source])
 # 将一组源文件 source 编译出一个库文件，并保存为 libname.so，其中有三种库文件类型，不写的话，默认为 STATIC
@@ -38,6 +54,10 @@ add_library(
         mmkv/MMKV.cpp
         mmkv/ProtoBuf.cpp
         ffmpeg/ffmpeg_main.cpp
+        ${SOUNDTOUCH_SRC}
+        ${FFMPEG_AUDIO_SRC}
+        ${JNI_UTIL_SRC}
+
 )
 
 # find_library(name1 path1 path2 ...) 将一个变量和Android NDK的某个库建立关联关系。
@@ -64,6 +84,7 @@ target_link_libraries(
         swresample
         swscale
         android
+        OpenSLES
 )
 
 #set(变量名 变量值)

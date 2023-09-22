@@ -23,6 +23,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDKAdvanced">
         <activity
+            android:name=".ffmpegaudio.FfmpegAudioActivity"
+            android:exported="false"
+            android:label="音乐播放器" />
+
+        <service
+            android:name=".ffmpegaudio.musicservice.MusicService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
             android:name=".ffmpeg.FfmpegActivity"
             android:exported="false"
             android:label="ffmpeg" />
