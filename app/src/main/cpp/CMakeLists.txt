@@ -16,10 +16,6 @@ include_directories(${CMAKE_SOURCE_DIR}/ffmpeg/include)
 include_directories(soundtouch/include)
 include_directories(soundtouch/SoundTouch)
 
-#util头文件引入
-include_directories(util/include)
-include_directories(util/JNI_UTIL)
-
 #x264和faac静态库
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/x264/${ANDROID_ABI}/lib")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/faac/${ANDROID_ABI}/lib")
@@ -30,8 +26,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDR
 aux_source_directory(./soundtouch/SoundTouch SOUNDTOUCH_SRC)
 
 aux_source_directory(./ffmpegaudio FFMPEG_AUDIO_SRC)
-
-aux_source_directory(./util/JNI_UTIL JNI_UTIL_SRC)
 
 
 # add_library(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] [source])
@@ -56,7 +50,6 @@ add_library(
         ffmpeg/ffmpeg_main.cpp
         ${SOUNDTOUCH_SRC}
         ${FFMPEG_AUDIO_SRC}
-        ${JNI_UTIL_SRC}
 
 )
 

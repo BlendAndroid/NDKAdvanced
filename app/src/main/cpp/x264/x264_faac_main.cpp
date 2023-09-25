@@ -27,7 +27,7 @@ uint32_t start_time;
 // RTMP对象
 RTMP *rtmp = 0;
 // 虚拟机的引用
-JavaVM *javaVM = 0;
+//JavaVM *javaVM = 0;
 
 void RTMP_close_free();
 
@@ -44,11 +44,11 @@ void callBack(RTMPPacket *packet) {
 }
 
 // 获取到JVM虚拟机的引用
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    javaVM = vm;
-    LOGE("保存虚拟机的引用");
-    return JNI_VERSION_1_4;
-}
+//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+//    javaVM = vm;
+//    LOGE("保存虚拟机的引用");
+//    return JNI_VERSION_1_4;
+//}
 
 void releasePackets(RTMPPacket *&packet) {
     if (packet) {
@@ -149,7 +149,8 @@ JNIEXPORT void JNICALL
 Java_com_blend_ndkadvanced_x264_LivePusher_native_1init(JNIEnv *env, jobject thiz) {
 
     // 设置Java回调回调
-    helper = new JavaCallHelper(javaVM, env, thiz);
+    // 暂时将javaVM设置为0
+    helper = new JavaCallHelper(0, env, thiz);
 
     // 实例化视频编码层
     videoChannel = new VideoChannel;
